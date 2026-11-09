@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ひみつのおへや</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #111;
+  font-family: "MS UI Gothic", "MS PGothic", "ＭＳ Ｐゴシック", "Hiragino Kaku Gothic Pro", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  color: #ccc;
+  padding: 0;
+  margin: 0;
+}
+.browser {
+  width: 100%;
+  max-width: 420px;
+  height: 100vh;
+  max-height: 844px;
+  background: #c0c0c0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: none;
+}
+.titlebar {
+  background: linear-gradient(to right, #000080, #1084d0);
+  color: #fff;
+  padding: 6px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: bold;
+  border-bottom: 1px solid #000;
+}
+.titlebar .buttons { display: flex; gap: 4px; }
+.titlebar .btn {
+  width: 22px; height: 18px;
+  background: #c0c0c0;
+  border: 1px outset #fff;
+  color: #000;
+  font-size: 12px;
+  text-align: center;
+  line-height: 16px;
+  cursor: pointer;
+}
+.toolbar {
+  background: #c0c0c0;
+  padding: 6px 8px;
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  border-bottom: 1px solid #808080;
+}
+.toolbar button {
+  background: #c0c0c0;
+  border: 1px outset #fff;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 60px;
+}
+.toolbar button:active { border-style: inset; }
+.address {
+  background: #fff;
+  padding: 6px 8px;
+  font-size: 13px;
+  color: #000;
+  border-bottom: 1px solid #808080;
+  font-family: "MS Gothic", monospace;
+}
+.content {
+  flex: 1;
+  background: var(--bg, #000000);
+  color: var(--fg, #00ff00);
+  transition: background 2s, color 2s;
+  padding: 14px;
+  overflow-y: auto;
+  font-size: 15px;
+  line-height: 1.6;
+  font-family: "MS Gothic", "ＭＳ ゴシック", monospace;
+  -webkit-overflow-scrolling: touch;
+}
+.content a { color: var(--link, #00ffff); text-decoration: underline; }
+.content a:visited { color: var(--link, #ff00ff); }
+.midi-player { cursor: pointer; }
+.blink {
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+.marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 12s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+.welcome { text-align: center; margin: 12px 0; }
+.welcome .stars { color: #ffff00; font-size: 16px; }
+.welcome h1 { color: #ff00ff; font-size: 26px; margin: 8px 0; letter-spacing: 1px; text-shadow: 2px 2px #000; }
+.counter { color: var(--fg, #00ff00); font-size: 15px; margin: 12px 0; text-align: center; font-weight: bold; }
+.kiriban { text-align: center; color: #ffff00; margin: 6px 0 16px; font-size: 12px; }
+.nav { text-align: center; margin: 16px 0; }
+.nav a { margin: 0 6px; font-size: 14px; color: var(--link, #00ffff); }
+.footer-note { text-align: center; color: #ff0000; margin: 12px 0; font-size: 12px; }
+.lastupdate { text-align: center; color: #888; margin-top: 16px; font-size: 11px; }
+.midi-player {
+  text-align: center;
+  margin: 10px 0;
+  color: #ffff00;
+  font-size: 11px;
+  border: 1px dashed #ffff00;
+  padding: 4px;
+}
+.diary-item { margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+.diary-item .date { color: #888; font-size: 11px; }
+.diary-item .title { color: #ff00ff; font-weight: bold; margin: 3px 0; }
+.bbs-post { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #333; }
+.bbs-post .hn { color: var(--link, #00ffff); font-weight: bold; }
+.bbs-post .no { color: #666; font-size: 10px; }
+.ending {
+  text-align: center;
+  padding-top: 30px;
+  color: #fff;
+}
+.ending .big-counter { font-size: 42px; color: #00ff00; margin: 16px 0; letter-spacing: 2px; }
+.ending .birthday { color: #ff0000; font-size: 26px; margin-top: 30px; }
+.new-badge {
+  color: #ff0000;
+  font-weight: bold;
+  font-size: 11px;
+  margin-left: 6px;
+}
+.shift {
+  display: inline-block;
+  animation: slightShift 0.3s ease;
+}
+@keyframes slightShift {
+  0% { transform: translate(0, 0); }
+  30% { transform: translate(1px, -1px); }
+  60% { transform: translate(-1px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+.admin-post {
+  cursor: pointer;
+}
+.under-construction {
+  text-align: center;
+  margin: 30px 0;
+  padding: 20px;
+  border: 3px dashed #ffff00;
+  background: #111;
+}
+.uc-text {
+  font-size: 28px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  animation: ucBlink 0.8s steps(2, end) infinite, ucColor 2s linear infinite;
+  text-shadow: 2px 2px #000;
+}
+.uc-barrier {
+  font-size: 20px;
+  margin: 12px 0;
+  animation: barrier 1.2s steps(4, end) infinite;
+  letter-spacing: 2px;
+}
+.uc-sub {
+  color: #ffff00;
+  font-size: 14px;
+  margin-top: 10px;
+  animation: blink 1.5s step-end infinite;
+}
+@keyframes ucBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+@keyframes ucColor {
+  0% { color: #ff0000; }
+  25% { color: #ffff00; }
+  50% { color: #ff0000; }
+  75% { color: #ffff00; }
+  100% { color: #ff0000; }
+}
+@keyframes barrier {
+  0% { content: "🚧🚧🚧🚧🚧"; }
+  25% { content: "🚧🚧🚧🚧🚧"; }
+  50% { content: "⚠⚠⚠⚠⚠"; }
+  75% { content: "🚧🚧🚧🚧🚧"; }
+  100% { content: "🚧🚧🚧🚧🚧"; }
+}
+/* BBS書き込みフォーム */
+.bbs-form { border: 1px solid #555; padding: 8px; margin-bottom: 12px; font-size: 13px; }
+.bbs-form input, .bbs-form textarea {
+  background: #fff; color: #000; border: 2px inset #c0c0c0;
+  font-family: "MS Gothic", monospace; font-size: 14px; padding: 2px 4px;
+}
+.bbs-form input { width: 60%; margin-left: 4px; }
+.bbs-form textarea { width: 100%; margin: 6px 0; resize: vertical; }
+.bbs-form button, .dlg button {
+  background: #c0c0c0; border: 2px outset #fff; padding: 4px 14px;
+  font-family: inherit; font-size: 13px; color: #000; cursor: pointer;
+}
+/* キリ番ダイアログ */
+.dlg-back { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); }
+.dlg { width: 280px; background: #c0c0c0; border: 2px outset #fff; color: #000; font-family: "MS UI Gothic", sans-serif; box-shadow: 2px 2px 0 #000; }
+.dlg-title { background: linear-gradient(to right, #000080, #1084d0); color: #fff; font-weight: bold; font-size: 12px; padding: 3px 6px; }
+.dlg-body { padding: 18px 14px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+.dlg-icon { display: inline-flex; width: 28px; height: 28px; border-radius: 50%; background: #ffff00; border: 1px solid #000; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+.dlg-btns { text-align: center; padding-bottom: 12px; }
+/* しゃしん */
+.photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 10px; }
+.photo { text-align: center; }
+.photo img { width: 100%; height: auto; border: 3px ridge #c0c0c0; display: block; background: #222; }
+.photo-date { color: #888; font-size: 10px; margin-top: 3px; }
+.photo-cap { font-size: 12px; margin-top: 1px; }
+/* 自走の痕跡 */
+.diary-item .cat { color: #666; font-size: 10px; margin-top: 4px; }
+.diary-item .autolink { font-size: 12px; margin-top: 3px; }
+.diary-item.flash { outline: 1px solid var(--link, #00ffff); }
+/* IEのエラーページ */
+.ie-error { background: #fff; color: #000; padding: 16px; font-family: "MS UI Gothic", sans-serif; font-size: 13px; line-height: 1.7; }
+.ie-error-title { font-size: 17px; font-weight: bold; margin-bottom: 10px; }
+.ie-error hr { border: none; border-top: 1px solid #999; margin: 12px 0; }
+/* ===== パステル化（上の黒地スタイルを上書き） ===== */
+.content {
+  --bg: #fff6fa; --fg: #6e5a78; --link: #3d95d6; --accent: #ff6fae; --sub: #b79cc6; --line: #f6c6dc;
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ctext x='4' y='14' font-size='9' fill='%23ffd6e8'%3E%E2%98%86%3C/text%3E%3Ctext x='24' y='34' font-size='7' fill='%23d8ecfb'%3E%E2%99%A1%3C/text%3E%3C/svg%3E");
+  color: var(--fg);
+  font-family: "MS PGothic", "ＭＳ Ｐゴシック", "Hiragino Kaku Gothic Pro", "Osaka", sans-serif;
+  font-size: 13px; line-height: 1.75;
+  transition: filter 2s;
+}
+.content a { color: var(--link); }
+.content a:visited { color: #9a6fd0; }
+.ptitle { color: var(--accent); text-align: center; font-weight: bold; font-size: 15px; margin-bottom: 10px; }
+.deco { color: var(--sub); text-align: center; font-size: 11px; letter-spacing: 1px; overflow: hidden; white-space: nowrap; }
+.marquee span { color: var(--accent); font-size: 12px; }
+.welcome h1 { color: var(--accent); text-shadow: 2px 2px 0 #fff, 3px 3px 0 #ffd0e4; font-size: 28px; }
+.since { color: var(--sub); font-size: 11px; font-style: italic; }
+.midi-player { color: var(--sub); border: 1px dashed var(--sub); background: #fff; }
+.counter { color: var(--fg); font-size: 13px; font-weight: normal; }
+.counter-img { display: inline-flex; gap: 1px; vertical-align: middle; }
+.counter-img .digit {
+  display: inline-block; width: 13px; height: 19px; line-height: 19px; text-align: center;
+  background: linear-gradient(#333 0 50%, #111 50%); color: #7cff7c; font-family: "Courier New", monospace;
+  font-weight: bold; font-size: 14px; border-radius: 2px;
+}
+.big-counter.counter-img .digit { width: 26px; height: 38px; line-height: 38px; font-size: 28px; }
+.kiriban { color: var(--accent); }
+.menu { background: #fff; border: 2px dotted var(--line); margin: 14px 8px; padding: 10px; text-align: center; line-height: 2.1; }
+.menu-title { color: var(--sub); font-size: 11px; }
+.menu a { margin: 0 6px; font-size: 14px; white-space: nowrap; }
+.small-note { text-align: center; color: var(--sub); font-size: 11px; margin: 6px 0; }
+.footer-note { color: #e05a8a; }
+.lastupdate { color: var(--sub); }
+.credit { text-align: center; font-size: 10px; color: var(--sub); margin-top: 6px; }
+.diary-item { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 12px; }
+.diary-item .date { color: var(--sub); }
+.diary-item .title { color: var(--accent); }
+.diary-item .cat { color: var(--sub); }
+.diary-item.flash { outline: 2px solid var(--accent); }
+.bbs-post { background: #fff; border: 1px solid var(--line); padding: 8px 10px; margin-bottom: 8px; }
+.bbs-post .hn { color: var(--link); }
+.bbs-post .no { color: var(--sub); }
+.bbs-form { background: #fff; border: 1px solid var(--line); }
+.bbs-form input, .bbs-form textarea { border: 1px solid var(--sub); }
+.under-construction { background: #fffbe0; }
+.uc-sub { color: #c89a10; }
+.photo img { border: 3px solid #fff; box-shadow: 0 0 0 1px var(--line); }
+.photo-date { color: var(--sub); }
+.prof { width: 100%; border-collapse: collapse; background: #fff; }
+.prof th, .prof td { border: 1px solid var(--line); padding: 5px 8px; font-size: 12px; text-align: left; vertical-align: top; }
+.prof th { color: var(--accent); white-space: nowrap; background: #fff0f6; font-weight: normal; }
+.link-row { text-align: center; margin: 10px 0; }
+.banner {
+  display: inline-block; width: 200px; height: 40px; line-height: 36px; border: 2px solid; font-weight: bold;
+  font-size: 14px; text-decoration: none !important; letter-spacing: 1px;
+}
+.banner.own { background: #ffe4f0; color: var(--accent); border-color: var(--accent); }
+.link-note { font-size: 11px; color: var(--sub); }
+.closed { text-align: center; padding-top: 30px; }
+.ending { color: var(--fg); }
+.ending .birthday { color: var(--accent); }
+.updates { background: #fff; border: 1px solid var(--line); margin: 12px 8px 0; padding: 8px 10px; font-size: 12px; }
+.updates .menu-title { text-align: center; margin-bottom: 4px; }
+.upd { line-height: 1.7; }
+.upd-date { color: var(--sub); }
+/* ===== メーラー（Outlook Express風） ===== */
+.browser { position: relative; }
+#mailer { position: absolute; inset: 0; background: #c0c0c0; display: flex; flex-direction: column; color: #000;
+  font-family: "MS UI Gothic", "MS PGothic", sans-serif; font-size: 12px; z-index: 20; animation: mlOpen .25s ease-out; }
+@keyframes mlOpen { from { transform: scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+.ml-menu { padding: 3px 6px; border-bottom: 1px solid #808080; white-space: nowrap; overflow: hidden; }
+.ml-tools { display: flex; gap: 4px; padding: 4px 6px; border-bottom: 1px solid #808080; flex-wrap: wrap; }
+.ml-tools span { border: 1px outset #fff; padding: 3px 6px; background: #c0c0c0; }
+.ml-folder { padding: 4px 8px; font-weight: bold; background: #dcdcdc; border-bottom: 1px solid #808080; }
+.ml-list { background: #fff; border: 2px inset #c0c0c0; margin: 4px; }
+.ml-head, .ml-row { display: grid; grid-template-columns: 22px 70px 1fr 104px; gap: 4px; padding: 3px 4px; align-items: center; }
+.ml-head { background: #c0c0c0; border-bottom: 1px solid #808080; }
+.ml-head span { border-right: 1px solid #808080; }
+.ml-row { cursor: pointer; white-space: nowrap; overflow: hidden; }
+.ml-row span { overflow: hidden; text-overflow: ellipsis; }
+.ml-row.unread { font-weight: bold; }
+.ml-row.sel { background: #000080; color: #fff; }
+.ml-preview { flex: 1; background: #fff; border: 2px inset #c0c0c0; margin: 0 4px 4px; overflow-y: auto; }
+.ml-empty { color: #808080; padding: 20px; text-align: center; }
+.ml-hdr { background: #f0f0f0; border-bottom: 1px solid #c0c0c0; padding: 6px 8px; line-height: 1.6; }
+.ml-attach { color: #00f; text-decoration: underline; cursor: pointer; }
+.ml-body { padding: 10px; font-size: 13px; line-height: 1.75; font-family: "MS PGothic", sans-serif; }
+.ml-status { border-top: 1px solid #808080; padding: 3px 8px; }
+/* ===== ウイルス ===== */
+#virus { position: fixed; inset: 0; z-index: 100; overflow: hidden; }
+#virus.black { background: #000; }
+#virus .vdlg { position: absolute; width: 240px; }
+.shake { animation: shake .12s linear infinite; }
+@keyframes shake { 0% { transform: translate(0,0); } 25% { transform: translate(2px,-1px); } 50% { transform: translate(-2px,1px); } 75% { transform: translate(1px,2px); } 100% { transform: translate(0,0); } }
+.dos { color: #c0c0c0; background: #000; font-family: "MS Gothic", "Courier New", monospace; font-size: 12px; line-height: 1.45;
+  white-space: pre-wrap; word-break: break-all; padding: 10px; height: 100%; overflow-y: auto; }
+.dos.dead { height: auto; padding: 16px; font-size: 14px; }
+.cursor { animation: blink 1s step-end infinite; }
+#virus .press { position: absolute; left: 0; right: 0; bottom: 40px; text-align: center; color: #555; font-family: "Courier New", monospace;
+  font-size: 12px; opacity: 0; transition: opacity 2s; cursor: pointer; }
+#virus .press.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="browser">
+  <div class="titlebar">
+    <span id="title">Internet Explorer - MI⭐︎KUの部屋</span>
+    <div class="buttons">
+      <div class="btn">_</div>
+      <div class="btn">□</div>
+      <div class="btn" onclick="askReset()">×</div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button onclick="goBack()">戻る</button>
+    <button onclick="goForward()">進む</button>
+    <button onclick="refresh()">更新</button>
+    <button onclick="goHome()">ホーム</button>
+  </div>
+  <div class="address">アドレス: <span id="url">http://www.???.ne.jp/~room/</span></div>
+  <div class="content" id="content"></div>
+</div>
+
+<script>
+const state = {
+  counter: 56,
+  currentPage: 'top',
+  history: ['top'],
+  historyIndex: 0,
+  posts: [
+    { id: 1, date: '2003.03.03', title: '日記はじめました☆', body: 'こんにちはー！\n今日からHPで日記をはじめます（＾＾）\nタグとか全然わかんなくて、ここまで作るのに一週間かかった…（汗）\n学校のこととか、どうでもいいこととか書いていきます。\nよろしくね☆', visible: true },
+    { id: 2, date: '2003.03.06', title: 'テスト終わったー', body: '学年末テスト、やっと終わったー！！\n数学は…聞かないで（＞＿＜）\n帰りにさっちんとプリクラ撮った☆\nまた明日。', visible: true },
+    { id: 3, date: '2003.03.09', title: 'つぼみ', body: 'あったかくなってきたね。\n部屋の窓から見える木に、つぼみがついてた。\n咲いたら写メ撮ろっと♪\nまた明日。', visible: true },
+    { id: 4, date: '2003.03.12', title: 'カウンター', body: 'カウンター、もうすぐ100！\n見に来てくれてありがとう（＾＾）\nまた明日。', visible: false },
+    { id: 5, date: '2003.03.15', title: '☆みかん☆', body: '☆みかん☆がいつもカキコしてくれる。うれしい（＾＾）\nみかんのHPもかわいいんだよ。リンク貼らせてもらいました☆\nまた明日。', visible: false },
+    { id: 6, date: '2003.03.18', title: '着メロ', body: '着メロ変えた！\n和音のやつ、いっぱいダウンロードしてたらパケ代すごいことになりそう…（汗）\nまた明日。', visible: false },
+    { id: 7, date: '2003.03.21', title: '春休み〜', body: '春休み〜♪\n一日中パソコンの前にいる。ママに怒られた（＾＾；）', visible: false },
+    { id: 8, date: '2003.03.24', title: 'カラオケ', body: 'さっちんとカラオケ行った！\nさっちん歌うまいんだよー。わたしは音痴…\nまた明日。', visible: false },
+    { id: 9, date: '2003.03.27', title: '雨', body: '雨。\n雨の日は、部屋でMD聴いてるのが好き。\nまた明日。', visible: false },
+    { id: 10, date: '2003.03.30', title: '壁紙', body: '今日も普通。\nHPの壁紙変えてみたけど、どうかな？\nまた明日。', visible: false },
+    { id: 11, date: '2003.04.02', title: '新しいCD', body: '新しいCD買ったよ☆\nMDに落として、ずっと聴いてる。\n☆みかん☆は最近なに聴いてる？', visible: false },
+    { id: 12, date: '2003.04.05', title: 'クラス替え', body: 'クラス替え！！\nさっちんとまた同じクラス！！やったー（＾＾）v\nまた明日。', visible: false },
+    { id: 13, date: '2003.04.08', title: 'ぽん太', body: 'ぽん太がキリ番狙ってるらしい（笑）\nまだ200くらいだよー。気が早い！\nまた明日。', visible: false },
+    { id: 14, date: '2003.04.11', title: '休み時間', body: '今日も学校。\n休み時間、さっちんとずっとしゃべってた。\nまた明日。', visible: false },
+    { id: 15, date: '2003.04.14', title: '桜', body: '桜が満開！\n部屋の窓から撮ったやつ、しゃしんのページに載せるね。\nまだ工事中だけど（汗）\nまた明日。', visible: false },
+    { id: 16, date: '2003.04.17', title: 'りんご飴さん', body: 'りんご飴さんが日記の感想書いてくれてた。\nちゃんと読んでくれてる人がいるんだなーって。ありがとうございます（＾＾）\nまた明日。', visible: false },
+    { id: 17, date: '2003.04.20', title: 'カキコありがと', body: 'BBSに書き込んでくれた人、ありがとう（＾＾）\nでも名前がなかったよー。誰だろ？\nまた来てね☆\nまた明日。', visible: false },
+    { id: 18, date: '2003.04.23', title: '普通', body: '今日も普通の日だったよ（＾＾）\nまた明日。', visible: false },
+    { id: 19, date: '2003.04.26', title: '夜', body: '音楽聴きながら日記書いてる。\n夜のこの時間がいちばん好き。', visible: false },
+    { id: 20, date: '2003.04.29', title: 'GW前', body: 'もうすぐGW！\nでも予定なし（笑）\nまた明日。', visible: false },
+    { id: 21, date: '2003.05.02', title: 'GW', body: 'GWだけど、ずっと家でネットしてた。\nADSLになってから、テレホの時間まで待たなくていいのが最高（＾＾）\nまた明日。', visible: false },
+    { id: 22, date: '2003.05.05', title: 'メール', body: 'さっちんからメール。\n「生きてるー？」だって（笑）生きてます。\nまた明日。', visible: false },
+    { id: 23, date: '2003.05.08', title: 'チャット', body: '放課後、☆みかん☆とチャットしてた。\n気づいたら2時間（笑）', visible: false },
+    { id: 24, date: '2003.05.11', title: '少し疲れた', body: '最近ちょっと疲れてる。\nでも大丈夫（＾＾）\nまた明日。', visible: false },
+    { id: 25, date: '2003.05.14', title: '雨', body: '雨の日が続いてる。\n部屋の中が好き。\nまた明日。', visible: false },
+    { id: 26, date: '2003.05.17', title: '中間', body: '中間テスト…全然できなかった（＞＿＜）\nまた明日。', visible: false },
+    { id: 27, date: '2003.05.20', title: 'さっちん', body: 'さっちんは学年で10番以内だって。すごすぎ！\nわたしは…聞かないで。\nまた明日。', visible: false },
+    { id: 28, date: '2003.05.23', title: '普通', body: '今日も普通。\nまた明日。', visible: false },
+    { id: 29, date: '2003.05.26', title: '空色さん', body: '空色さんのサイト、更新されてた。\n詩みたいな文章、きれいだなあ。わたしには書けない。\nまた明日。', visible: false },
+    { id: 30, date: '2003.05.29', title: 'トップ', body: '家でゆっくり。\nHPのトップ、ちょっとだけいじった☆', visible: false },
+    { id: 31, date: '2003.06.01', title: '雨', body: '雨。\n部屋の中にいるのが好き。\nまた明日。', visible: false },
+    { id: 32, date: '2003.06.04', title: 'プリクラ', body: 'さっちんとプリクラ撮った！\n落書きでふざけすぎた（笑）\nまた明日。', visible: false },
+    { id: 33, date: '2003.06.07', title: '音楽', body: '新しいCD。部屋で聴いてる。\nまた明日。', visible: false },
+    { id: 34, date: '2003.06.10', title: '†黒猫†さん', body: '†黒猫†さんが夜中にカキコしてた（笑）\nいつも何時に寝てるんだろ…\nまた明日。', visible: false },
+    { id: 35, date: '2003.06.13', title: '少し疲れた', body: '最近ちょっと疲れてる気がする。\n早く寝よ。', visible: false },
+    { id: 36, date: '2003.06.16', title: 'ゆう★', body: 'ゆう★が「おつかれ」って。\nゆう★はいつも一言（笑）\nまた明日。', visible: false },
+    { id: 37, date: '2003.06.19', title: '小テスト', body: 'また小テスト。できなかった（汗）\nまた明日。', visible: false },
+    { id: 38, date: '2003.06.22', title: '普通', body: '今日も普通の日だったよ。\nまた明日。', visible: false },
+    { id: 39, date: '2003.06.25', title: '梅雨', body: 'じめじめ…（＞＿＜）\n髪がまとまらない！\nまた明日。', visible: false },
+    { id: 40, date: '2003.06.28', title: '週末', body: '家でゆっくりしてた。\nまた明日。', visible: false },
+    { id: 41, date: '2003.07.01', title: '数学', body: '数学のテストあった。全然できなかった…（汗）\nまた明日。', visible: false },
+    { id: 42, date: '2003.07.04', title: 'アイス', body: '放課後、さっちんと一緒に帰ったよ。\nコンビニでアイス半分こ☆\nまた明日。', visible: false },
+    { id: 43, date: '2003.07.07', title: '七夕', body: '七夕☆\n短冊に願いごと書いた。ないしょ（＾＾）\n部屋の写メも載せてみたよ。散らかってるけど（汗）\nまた明日。', visible: false },
+    { id: 44, date: '2003.07.10', title: '普通', body: '今日も普通。☆みかん☆とチャットしてた。\nまた明日。', visible: false },
+    { id: 45, date: '2003.07.13', title: 'ちょっと疲れた', body: '最近ちょっと疲れてる気がする。でも大丈夫だと思う（＾＾）', visible: false },
+    { id: 46, date: '2003.07.16', title: 'りんご飴さん', body: 'りんご飴さん、心配してくれてありがとうございます。\nちゃんと寝ます（＾＾）\nまた明日。', visible: false },
+    { id: 47, date: '2003.07.19', title: '週末', body: '家でゆっくり。\nまた明日。', visible: false },
+    { id: 48, date: '2003.07.22', title: '夏休み前', body: 'あと少しで夏休み！\n宿題のことは考えない（笑）\nまた明日。', visible: false },
+    { id: 49, date: '2003.07.25', title: '終業式', body: '終業式！\n通知表は…見なかったことにする（＾＾；）\nまた明日。', visible: false },
+    { id: 50, date: '2003.07.28', title: 'もうすぐ1000', body: 'カウンター、もうすぐ1000！\nだれが踏むのかなー。\nキリ番踏んだ人は、BBSにカキコしてね☆\nまた明日。', visible: false },
+    { id: 51, date: '2003.08.01', title: '夏休み！', body: '夏休み、毎日ひま〜！\n毎日更新するぞー（＾＾）v', visible: false },
+    { id: 52, date: '2003.08.04', title: '普通の日', body: '今日も家にいた。音楽聴いて日記書いて。\nまた明日。', visible: false },
+    { id: 53, date: '2003.08.07', title: '外', body: 'なんとなく外に出るのが面倒くさくなってきた。', visible: false },
+    { id: 54, date: '2003.08.10', title: 'さっちん', body: 'さっちん、明日のこと忘れてないよねー？', visible: false },
+    { id: 55, date: '2003.08.13', title: '普通', body: '今日も普通の日だったよ（＾＾）\nまた明日。', visible: false },
+    { id: 56, date: '2003.08.15', title: '誕生日じゃないのに', body: '今日はなんか面白いことがあった。みんなが誕生日おめでとうって言ってくるの。今日じゃないのに。おかしいよね（笑）\n☆みかん☆もゆう★も言ってた。', visible: false },
+    { id: 57, date: '2003.08.18', title: 'その後', body: 'あの日のことはみんなに聞いても「そんなこと言ってないよ」って。\nさっちんにも聞いたけど覚えてないみたい。', visible: false },
+    { id: 58, date: '2003.08.21', title: 'まあいいか', body: '気のせいだったのかな。まあいいか（＾＾）', visible: false },
+    { id: 59, date: '2003.08.24', title: 'だるい', body: '最近体がだるい。', visible: false },
+    { id: 60, date: '2003.08.27', title: '調子が悪い', body: '学校も休みがちになってきた。病気なのかな。わかんない。', visible: false },
+    { id: 61, date: '2003.09.02', title: '病気だとわかった', body: '自分が病気だってわかった。\nどうしてわかったのかはうまく説明できない。\nでも確かにわかった。', visible: false },
+    { id: 62, date: '2003.09.06', title: 'どんどん悪くなってる', body: 'どんどん悪くなってる気がする。\n外に出るのが怖い。部屋の中にいる方が安心する。\n色が赤黒くなってきている。', visible: false },
+    { id: 63, date: '2003.09.10', title: '怖い', body: 'どうしよう、怖い。\n死ぬのかな。\n怖いよ、みんな。', visible: false },
+    { id: 64, date: '2003.09.12', title: 'お知らせ', body: '生前は多くの方にお世話になりました。本人もこのホームページを大切にしておりましたので、しばらくはこのまま残しておきたいと思います。\n\n父より', visible: false, isNotice: true },
+    { id: 65, date: '2003.09.14', title: '今日は天気がよかった', body: '今日は天気がよかった。風がちょっと涼しくて、窓を開けてたら気持ちよかった。なんとなく外に出る気にはなれなかった。部屋の中で本を読んでた。前にも同じこと書いた気がする。また明日。', visible: false, phase: 1 },
+    { id: 66, date: '2003.09.17', title: '今日もお天気だったよ', body: '今日もお天気だったよ。窓の外を見てたら、誰かが自転車で通ってった。知ってる人かなと思ったけど、よくわからなかった。知ってる人かなと思った。また明日ね。また明日ね。', visible: false, phase: 1 },
+    { id: 67, date: '2003.09.21', title: '部屋の中で', body: '今日はあんまり外を見なかった。部屋の中にいると、時間がゆっくり流れてる気がする。前に書いた記事を読み返してたら、ちょっと違うところがあった。でも、気のせいかもしれない。でも、気のせいかもしれない。気のせいかもしれない。また明日。', visible: false, phase: 2 },
+    { id: 68, date: '2003.09.25', title: 'みんなが来てくれた', body: '今日は、みんなが来てくれた。誕生日おめでとうって、何度も言われた。今日じゃないのに、おかしいよね。でも、うれしかったから、そのままにしておいた。おかしいよね。おめでとう。また明日ね。', visible: false, phase: 2 },
+    { id: 69, date: '2003.09.28', title: '風が入ってきた', body: '今日は部屋の中で過ごした。窓を開けてたら、風が入ってきた。風がちょっと涼しくて、窓を開けてたら気持ちよかった。前に書いたことと、同じことをまた書いてる気がする。同じことをまた書いてる気がする。同じことをまた書いてる。気にしないでおこう。また明日。', visible: false, phase: 3 },
+    { id: 70, date: '2003.10.02', title: '色が赤黒くなってきている', body: '今日はあんまり外を見なかった。部屋の中にいると、時間がゆっくり流れてる気がする。色が赤黒くなってきている。どうしよう、怖い、死ぬのかな。でも、まだ大丈夫だと思う。色が赤黒くなってきている。どうしよう、怖い。また明日ね。', visible: false, phase: 3 },
+    { id: 71, date: '2003.10.06', title: 'カウンターが減ってる', body: '今日は、みんなが来てくれた。誕生日おめでとうって、何度も言われた。今日じゃないのに、おかしいよね。アクセスカウンターが減ってる。キリ番を踏んだ人は、掲示板に書き込んでね。おめでとう。カウンターが減ってる。また明日。', visible: false, phase: 4 },
+    { id: 72, date: '2003.10.10', title: '今日は天気がよかった', body: '今日は天気がよかった。風がちょっと涼しくて、窓を開けてたら気持ちよかった。色が赤黒くなってきている。どうしよう、怖い、死ぬのかな、怖いよ、みんな。でも、まだ大丈夫だと思う。キリ番を踏んだ人は、掲示板に書き込んでね。怖いよ、みんな。また明日ね。', visible: false, phase: 4 },
+    { id: 73, date: '2003.10.14', title: 'みんなが来てくれた', body: '今日は、みんなが来てくれた。☆みかん☆が誕生日おめでとうって言ってた。ぽん太も来てたけど、すぐにいなくなった。さっちん、明日のこと忘れてないよねー？アクセスカウンターが減ってる。あなたは 00001000 人目のお客様です。キリ番を踏んだ人は、掲示板に書き込んでね。おめでとう。また明日。', visible: false, phase: 5 },
+    { id: 74, date: '2003.10.18', title: '部屋の中で', body: '今日はあんまり外を見なかった。部屋の中にいると、時間がゆっくり流れてる気がする。前に書いた記事を読み返してたら、ちょっと違うところがあった。あなたは 00001234 人目のお客様です。キリ番を踏んだ方はBBSにカキコしてね♪Last Update : 2003.08.17また明日ね。あなたは 00001234 人目のお客様です。また明日ね。', visible: false, phase: 5 }
+  ],
+  step: 0,          // 現在の進行段階（STEPSの添字）
+  diaryOpens: 0,    // 日記を開いた回数
+  drift: 0,         // 死後、ページ移動ごとにカウンターが削れていく分
+  sawLast: false,   // 最終段階の日記を読んだか
+  playerPosts: [],  // プレイヤーのBBS書き込み
+  readIds: {},      // 記事ID → 初めて読んだ段
+  lastHn: ''
+};
+
+// ===== 進行表：日記を開くたびに1段ずつ進む =====
+// 各段で公開する日記ID。テンポはここだけ触れば調整できる。
+// 日記を開くたびに1段進む。刻みを細かくすると長く、粗くすると短くなる（30分を想定して46段）。
+const STEPS = [[1,2,3]];
+for (let id = 4; id <= 55; id += 2) STEPS.push(id + 1 <= 55 ? [id, id + 1] : [id]);   // 生前：2件ずつ
+for (let id = 56; id <= 74; id++) STEPS.push([id]);                                     // 56以降：1件ずつ
+const LAST_STEP = STEPS.length - 1;
+const revealAt = {};
+STEPS.forEach((ids, s) => ids.forEach(id => { revealAt[id] = s; }));
+const DEATH_STEP = revealAt[64];     // お知らせ（父より）
+const STAGE_REWRITE = revealAt[67];  // 第二段階：過去が書き換わる
+const STAGE_SELF = revealAt[69];     // 第三段階：自走
+const STAGE_YOU = revealAt[71];      // 「あなた」が出てくる
+const STAGE_NOTICE = revealAt[73];   // 第四段階：お知らせが読めなくなる
+
+// 訪問者カウンターの目印（記事ID → その段のカウンター値）。間は直線でつなぐ。
+// 生前は56から増え、8/7（記事53）で1000を通過する。誰も名乗り出ない＝踏み逃げ。死後は1118から1000へ戻っていく。
+const COUNTER_ANCHORS = [
+  [1, 56], [15, 300], [29, 560], [43, 900], [50, 985], [53, 1009],
+  [55, 1031], [56, 1040], [63, 1112], [64, 1118],
+  [65, 1117], [66, 1112], [67, 1103], [68, 1090], [69, 1074], [70, 1058], [71, 1045], [72, 1033], [73, 1020], [74, 1008]
+].map(([id, v]) => [revealAt[id], v]);
+function counterAt(step) {
+  const A = COUNTER_ANCHORS;
+  if (step <= A[0][0]) return A[0][1];
+  for (let i = 1; i < A.length; i++) {
+    if (step <= A[i][0]) {
+      const [s0, v0] = A[i - 1], [s1, v1] = A[i];
+      return Math.round(v0 + (v1 - v0) * (step - s0) / (s1 - s0));
+    }
+  }
+  return A[A.length - 1][1];
+}
+
+// ===== BBS：日付で日記と連動。公開済み日記の最新日付までの書き込みだけ出る =====
+// No. は表示時に古い順の通し番号として自動で振る。
+const BBS = [
+  // ---- 開設直後（仮文。コンセプトの「初カキコ／相互リンク／テスト投稿」） ----
+  {d:'03.03', hn:'通りすがり', text:'おめでとう', appear:revealAt[73]},
+  {d:'03.03', hn:'☆みかん☆', text:'初カキコです！'},
+  {d:'03.03', hn:'みく', text:'ありがと〜（＾＾）ゆっくりしてってね♪', admin:true},
+  {d:'03.03', hn:'ゆう★', text:'おつかれ'},
+  {d:'03.07', hn:'空色', text:'はじめまして。詩のサイトをやっています。相互リンクお願いします。'},
+  {d:'03.07', hn:'みく', text:'リンク貼りました（＾＾）よろしくです☆', admin:true},
+  {d:'03.09', hn:'ぽん太', text:'テスト投稿です'},
+  {d:'03.09', hn:'みく', text:'テストおつかれ（笑）', admin:true},
+  {d:'03.04', hn:'さっちん', text:'日記更新した？'},
+  {d:'03.05', hn:'☆みかん☆', text:'またきたよ〜'},
+  {d:'03.08', hn:'りんご飴', text:'新しい日記読みました。'},
+  {d:'03.10', hn:'☆みかん☆', text:'春だねー！桜見に行こうよ♪'},
+  {d:'03.11', hn:'通りすがり', text:'……'},
+  {d:'03.13', hn:'ゆう★', text:'おつかれー'},
+  {d:'03.15', hn:'さっちん', text:'また明日ね。'},
+  {d:'03.16', hn:'☆みかん☆', text:'今日も元気いっぱい♪'},
+  {d:'03.18', hn:'ぽん太', text:'カウンター増えてる！'},
+  {d:'03.20', hn:'りんご飴', text:'日記楽しみにしています。'},
+  {d:'03.22', hn:'†黒猫†', text:'夜の帳が……'},
+  {d:'03.24', hn:'ゆう★', text:'きた'},
+  {d:'03.25', hn:'さっちん', text:'学校おつかれ。'},
+  {d:'03.27', hn:'☆みかん☆', text:'また遊びにきたよ〜(´∀｀)'},
+  {d:'03.29', hn:'ぽん太', text:'キリ番まだ遠いな。'},
+  {d:'03.31', hn:'りんご飴', text:'更新ありがとうございます。無理しないで。'},
+  {d:'04.01', hn:'さっちん', text:'今日の日記、普通の日だったね。'},
+  {d:'04.03', hn:'☆みかん☆', text:'日記更新したね！読んでるよ♪'},
+  {d:'04.04', hn:'ゆう★', text:'おつかれ'},
+  {d:'04.06', hn:'通りすがり', text:'……'},
+  {d:'04.06', hn:'さっちん', text:'新学期始まったね。また同じクラスで嬉しい。'},
+  {d:'04.07', hn:'ぽん太', text:'キリ番狙ってるぞ！'},
+  {d:'04.09', hn:'さっちん', text:'また明日ね。'},
+  {d:'04.10', hn:'☆みかん☆', text:'またきたよ(´∀｀)'},
+  {d:'04.12', hn:'ぽん太', text:'カウンター増えてるな！'},
+  {d:'04.13', hn:'りんご飴', text:'日記楽しみにしてます。'},
+  {d:'04.15', hn:'ゆう★', text:'きた'},
+  {d:'04.16', hn:'りんご飴', text:'新しい日記読みました。学校の話、楽しかったです。'},
+  {d:'04.19', hn:'†黒猫†', text:'闇の中で……'},
+  {d:'04.19', hn:'', text:'おめでとう', appear:revealAt[67]},
+  {d:'04.21', hn:'さっちん', text:'学校おつかれ。'},
+  {d:'04.24', hn:'☆みかん☆', text:'今日も元気！'},
+  {d:'04.27', hn:'ぽん太', text:'キリ番まだ？'},
+  {d:'04.30', hn:'りんご飴', text:'更新ありがとうございます。'},
+  {d:'05.01', hn:'ゆう★', text:'おつかれー'},
+  {d:'05.04', hn:'さっちん', text:'日記読んでる。'},
+  {d:'05.07', hn:'☆みかん☆', text:'また遊びにきたよ〜♪'},
+  {d:'05.09', hn:'ぽん太', text:'キリ番近い！'},
+  {d:'05.12', hn:'りんご飴', text:'無理しないでくださいね。'},
+  {d:'05.13', hn:'ゆう★', text:'きた'},
+  {d:'05.16', hn:'†黒猫†', text:'夜が来た……'},
+  {d:'05.18', hn:'さっちん', text:'また明日ね。'},
+  {d:'05.21', hn:'☆みかん☆', text:'学校おつかれー♪'},
+  {d:'05.24', hn:'ぽん太', text:'カウンター順調に増えてる！'},
+  {d:'05.25', hn:'空色', text:'空が青い。ただそれだけ。'},
+  {d:'05.28', hn:'りんご飴', text:'今日の日記も良かったです。'},
+  {d:'05.31', hn:'ゆう★', text:'おつかれ'},
+  {d:'06.02', hn:'さっちん', text:'日記更新したね。読んでるよ。'},
+  {d:'06.05', hn:'☆みかん☆', text:'またきたよ〜(´∀｀)'},
+  {d:'06.08', hn:'ぽん太', text:'キリ番踏んだら書き込めよ！'},
+  {d:'06.09', hn:'†黒猫†', text:'真夜中の訪問者よ……ここにいる。'},
+  {d:'06.12', hn:'りんご飴', text:'日記の更新、楽しみにしています。'},
+  {d:'06.15', hn:'☆みかん☆', text:'またきたよ〜♪ 今日も遊びに来た！'},
+  {d:'06.17', hn:'さっちん', text:'日記読んでるよ。普通の日が続いてていいね。'},
+  {d:'06.20', hn:'†黒猫†', text:'闇は深まる……'},
+  {d:'06.23', hn:'ぽん太', text:'カウンター増えてる！キリ番近いぞー！'},
+  {d:'06.26', hn:'ゆう★', text:'きたよ'},
+  {d:'06.29', hn:'☆みかん☆', text:'また遊びにきたよ〜(´∀｀) 今日もいい天気だね♪'},
+  {d:'07.02', hn:'通りすがり', text:'こんにちは'},
+  {d:'07.05', hn:'ぽん太', text:'キリ番踏んだ人は書き込んでね！踏み逃げ禁止！！'},
+  {d:'07.08', hn:'さっちん', text:'管理人ちゃんと学校で会ったよ。元気そうだった。'},
+  {d:'07.11', hn:'ゆう★', text:'きた'},
+  {d:'07.14', hn:'りんご飴', text:'体調崩されているようで心配です。ゆっくり休んでください。'},
+  {d:'07.18', hn:'空色', text:'窓の外に風が吹いている。部屋の中は静かだ。'},
+  {d:'07.21', hn:'ぽん太', text:'キリ番1000人目前！誰か踏むなよー！'},
+  {d:'07.24', hn:'通りすがり', text:'……'},
+  {d:'08.01', hn:'☆みかん☆', text:'夏休みだー！やったー♪ みんな何してる？'},
+  {d:'08.03', hn:'ぽん太', text:'キリ番まだ？誰か踏んでくれー！'},
+  {d:'08.04', hn:'ゆう★', text:'おつかれ'},
+  {d:'08.06', hn:'ぽん太', text:'うおー！あと３人でキリ番だったのに！！踏み逃げ誰だwww'},
+  {d:'08.06', hn:'通りすがり', text:'おめでとう', appear:revealAt[71]},
+  {d:'08.08', hn:'†黒猫†', text:'夜の帳が降りた……闇の住人よ、集え。'},
+  {d:'08.10', hn:'さっちん', text:'明日のこと忘れてないよねー？笑'},
+  {d:'08.10', hn:'みく', text:'もちろん！！たぶん！！笑', admin:true},
+  {d:'08.12', hn:'☆みかん☆', text:'みかん☆だよー！今日も元気いっぱい♪'},
+  {d:'08.14', hn:'ゆう★', text:'おつかれー'},
+  {d:'08.17', hn:'☆みかん☆', text:'今日も遊びにきたよぉ(´∀｀) 学校おつかれー♪'},
+  {d:'08.22', hn:'りんご飴', text:'日記読みました。いつも丁寧に書いていて素敵です。無理しないでくださいね。'},
+  {d:'08.28', hn:'さっちん', text:'管理人ちゃん、最近日記更新少なくない？大丈夫？'},
+  {d:'08.28', hn:'みく', text:'ちょっと疲れてるだけだよ（＾＾）心配してくれてありがとう。', admin:true},
+  // ---- ここから死後（仮文。差し替え前提） ----
+  {d:'09.12', hn:'りんご飴', text:'お知らせを読みました。言葉が見つかりません。'},
+  {d:'09.13', hn:'さっちん', text:'うそでしょ'},
+  {d:'09.13', hn:'☆みかん☆', text:'……'},
+  {d:'09.15', hn:'ぽん太', text:'カウンター、止まってる'},
+  {d:'09.18', hn:'通りすがり', text:'日記、更新されてませんか'},
+  {d:'09.25', hn:'☆みかん☆', text:'誕生日おめでとう'},
+  {d:'09.25', hn:'ゆう★', text:'おめでとう'},
+  {d:'09.29', hn:'さっちん', text:'誰が書いてるの？'},
+  {d:'10.02', hn:'みく', text:'また明日ね。', admin:true},
+  {d:'10.07', hn:'ぽん太', text:'カウンター減ってない？'},
+  {d:'10.14', hn:'さっちん', text:'明日のこと忘れてないよねー？笑'},
+  {d:'10.14', hn:'みく', text:'もちろん！！たぶん！！笑', admin:true},
+].map((p, i) => ({...p, date: '2003.' + p.d, seq: i}));
+
+// キリ番を踏んだ直後、BBSに現れる書き込み
+const KIRI_POST = {hn:'みく', text:'キリ番おめでとう！ ずっと待ってたよ。', admin:true};
+
+// 父のお知らせの崩壊（削るだけ。新しい言葉は足さない）
+const NOTICE_DECAY = {
+  68: '生前は多くの方にお世話になりました本人もこのホームページを大切にしておりましたので、しばらくはこのまま残しておきたいと思います。\n\n父より',
+  70: '生前は多くの方にお世話になりました本人もこのホームページを大切にしておりましたのでしばらくはこのまま残しておきたいと思います\n\n父より',
+  72: '多くの方にお世話になりました本人もこのホームページを大切にしておりましたのでこのまま残しておきたいと思います\n\n父より',
+  73: 'このホームページを大切にしておりましたのでこのまま残しておきたい\n\nより',
+  74: '\n\nより'
+};
+
+// 第二段階：一度読んだ記事に、一文だけ増える（id → 足す行）
+const ADDED_LINE = { 1: 'また明日ね。', 56: 'さっちんも言ってた。' };
+
+// 第三段階：自走した記事に、過去記事へのリンクが勝手に付く（id → リンク先id）
+const AUTO_LINKS = { 69: [65], 70: [62, 63], 71: [68, 56], 72: [63, 65], 73: [54, 56], 74: [67, 56, 1] };
+
+function categoryOf(p) {
+  if (state.step >= STAGE_NOTICE && (p.phase || p.isNotice || p.id === 56)) return 'おたんじょうび';
+  if (state.step >= STAGE_SELF && p.phase && revealAt[p.id] >= STAGE_SELF) return 'おたんじょうび';
+  return 'にっき';
+}
+
+function jumpTo(id) {
+  const el = document.getElementById('post-' + id);
+  if (!el) return;
+  el.scrollIntoView({behavior: 'smooth', block: 'start'});
+  el.classList.add('flash');
+  setTimeout(() => el.classList.remove('flash'), 1600);
+}
+
+function esc(t) {
+  return String(t).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+// 表示用の本文。段階に応じて書き換わる
+function bodyOf(p) {
+  let b = p.body;
+  if (p.isNotice) {
+    const keys = Object.keys(NOTICE_DECAY).map(Number).filter(id => revealAt[id] <= state.step).sort((x, y) => y - x);
+    if (keys.length) b = NOTICE_DECAY[keys[0]];
+  }
+  // 一度読んだ記事は、戻ってくると「また明日。」が「また明日ね。」になっている
+  const readAt = state.readIds[p.id];
+  const readBefore = readAt !== undefined && readAt < STAGE_REWRITE;
+  if (state.step >= STAGE_REWRITE && readBefore) b = b.replace(/また明日。/g, 'また明日ね。');
+  if (state.step >= STAGE_REWRITE && readBefore && ADDED_LINE[p.id]) b += '\n' + ADDED_LINE[p.id];
+  // 死後、プレイヤーがBBSに書き込むと、次に増えた日記に追記される
+  const s = revealAt[p.id];
+  if (s > DEATH_STEP && STEPS[s][STEPS[s].length - 1] === p.id) {
+    const visitors = state.playerPosts.filter(x => x.step === s - 1).map(x => x.hn);
+    if (visitors.length) {
+      // 第三段階の途中から、HNではなく「あなた」と呼ばれる
+      const who = s >= STAGE_YOU ? ['あなた'] : [...new Set(visitors)].map(h => esc(h));
+      b = insertBeforeSign(b, who.map(h => h + 'も来てくれた。').join('\n'));
+    }
+  }
+  if (p.id === 73 && !state.playerPosts.some(x => x.step === revealAt[73] - 1)) {
+    b = insertBeforeSign(b, 'あなたも来てくれた。');
+  }
+  return b;
+}
+
+// 末尾の「また明日。」「また明日ね。」の直前に一行足す。本文が改行の有無どちらでも動く
+function insertBeforeSign(body, line) {
+  const m = body.match(/^([\s\S]*?)\n?(また明日ね?。)\s*$/);
+  if (m) return m[1] + '\n' + line + '\n' + m[2];
+  return body + '\n' + line;
+}
+
+function postBbs() {
+  const hnEl = document.getElementById('bbsHn'), txEl = document.getElementById('bbsText');
+  const text = (txEl.value || '').trim();
+  if (!text) return;
+  const hn = (hnEl.value || '').trim() || '名無しさん';
+  state.lastHn = hn;
+  const post = {hn, text, date: latestDate(state.step), seq: 1000 + state.playerPosts.length, step: state.step, player: true};
+  post.replies = makeReplies(post);
+  post.due = (state.navCount || 0) + 1;   // ほかのページへ行くか「更新」を押すと返事が付いている
+  state.playerPosts.push(post);
+  render();
+}
+
+// ===== 常連の返事 =====
+// 生前は、その日付にまだBBSに来ている常連だけが返事をくれる（一人ずつ減っていく）。
+// 死後は、しばらく誰も返事をしない。そのあと、消えた常連が昔の言葉で返事をしはじめる。
+// 返事の文は仮文（差し替え前提）。{hn} はプレイヤーのHN。
+const REPLY_LIVING = {
+  '☆みかん☆': ['＞{hn}さん はじめまして〜(´∀｀) みかんだよ♪ よろしくね！', '＞{hn}さん またきてね〜♪', '＞{hn}さん カキコ仲間ふえたー！うれしい♪'],
+  'ぽん太':    ['＞{hn}さん もしかしてキリ番狙い？ライバル出現かwww', '＞{hn}さん 踏み逃げはダメだぞ！', '＞{hn}さん カウンター今いくつだった？'],
+  'さっちん':  ['＞{hn}さん はじめまして。管理人ちゃんの友達です。', '＞{hn}さん 日記、読んでくれてるんだね。'],
+  'ゆう★':     ['＞{hn}さん よろ', 'おつかれ', '＞{hn}さん きた'],
+  'りんご飴':  ['＞{hn}さん はじめまして。りんご飴と申します。よろしくお願いします。', '＞{hn}さん 素敵な書き込みですね。'],
+  '†黒猫†':    ['＞{hn}よ……新たな来訪者か。', '＞{hn}……闇はお前を歓迎する。'],
+  '空色':      ['＞{hn}さん 窓の外から、ようこそ。', '＞{hn}さん 風が少し変わった気がします。'],
+  '通りすがり': ['……']
+};
+const MIKU_FIRST = '＞{hn}さん はじめまして！カキコありがと〜（＾＾）ゆっくりしてってね♪';
+const MIKU_AGAIN = ['＞{hn}さん また来てくれたんだ〜うれしい（＾＾）', '＞{hn}さん いつもありがとう☆', '＞{hn}さん またね〜♪'];
+const REGULARS = Object.keys(REPLY_LIVING);
+const DEATH_DATE = '2003.09.12';
+// 常連が生前のBBSに最後に書き込んだ日（ここを過ぎると返事をくれなくなる）
+const LAST_SEEN = {};
+let MIKU_LAST = '';
+
+function makeReplies(post) {
+  if (!Object.keys(LAST_SEEN).length) {
+    BBS.forEach(b => {
+      if (b.appear || b.date >= DEATH_DATE) return;
+      if (b.admin) { if (b.date > MIKU_LAST) MIKU_LAST = b.date; return; }
+      if (!LAST_SEEN[b.hn] || b.date > LAST_SEEN[b.hn]) LAST_SEEN[b.hn] = b.date;
+    });
+  }
+  state.greeted = state.greeted || {};
+  const r = rnd(post.seq * 7919 + post.text.length * 31 + state.step * 101 + 3);
+  const pick = arr => arr[Math.floor(r() * arr.length)];
+  const shuffle = arr => arr.map(x => [r(), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+  const hn = esc(post.hn);
+  const s = state.step;
+  const out = [];
+  if (s < DEATH_STEP) {
+    const active = REGULARS.filter(n => (LAST_SEEN[n] || '') >= post.date);
+    const n = Math.min(active.length, 1 + Math.floor(r() * 2));
+    shuffle(active).slice(0, n).forEach(name => out.push({hn: name, text: pick(REPLY_LIVING[name]).replace(/\{hn\}/g, hn)}));
+    if (post.date <= MIKU_LAST) {
+      const first = !state.greeted[post.hn];
+      if (first || r() < 0.6) out.push({hn: 'みく', admin: true, text: (first ? MIKU_FIRST : pick(MIKU_AGAIN)).replace(/\{hn\}/g, hn)});
+    }
+    state.greeted[post.hn] = true;
+  } else if (s >= STAGE_REWRITE) {
+    // 消えた常連が、昔の自分の書き込みの言葉で返事をする
+    const n = s >= STAGE_NOTICE ? 3 : s >= STAGE_SELF ? 2 : 1;
+    shuffle(REGULARS).slice(0, n).forEach(name => {
+      let text;
+      if (s >= STAGE_NOTICE) text = 'おめでとう';
+      else {
+        const old = BBS.filter(b => b.hn === name && !b.appear && b.date < DEATH_DATE);
+        text = old.length ? pick(old).text : '……';
+        if (s >= STAGE_SELF) text = `＞${hn}さん ` + text;
+      }
+      out.push({hn: name, text});
+    });
+    if (s >= STAGE_YOU) out.push({hn: 'みく', admin: true, text: 'また明日ね。'});
+  }
+  // お知らせ〜第一段階のあいだは、誰も返事をしない
+  return out;
+}
+
+// ===== りんく集（すべて架空のサイト） =====
+const LINKS = [
+  {id:'mikan',  name:'☆みかん箱☆',    owner:'☆みかん☆', url:'http://www.???.ne.jp/~mikan/',   bg:'#ffd9a0', fg:'#e0701a', note:'みかんのおうち♪ イラストいっぱい'},
+  {id:'sorairo',name:'そらいろ詩集',    owner:'空色',      url:'http://www.???.or.jp/sorairo/',  bg:'#d6ecfa', fg:'#4a8ac0', note:'きれいな詩のサイトです'},
+  {id:'ponta',  name:'ぽん太のへや',    owner:'ぽん太',    url:'http://www.???.ne.jp/~ponta/',   bg:'#e8f5d0', fg:'#5a8a2a', note:'キリ番ハンター（笑）'},
+  {id:'kuroneko',name:'†漆黒ノ館†',     owner:'†黒猫†',    url:'http://www.???.com/kuroneko/',   bg:'#2a2030', fg:'#c8a0e8', note:'夜に行くとこわい…（笑）'},
+  {id:'sozai',  name:'ほしくず素材堂',  owner:'',          url:'http://www.???.jp/hoshikuzu/',   bg:'#fff4c8', fg:'#c89a10', note:'素材をお借りしてます'}
+];
+function bannerHtml(l) {
+  return `<a href="#" class="banner" style="background:${l.bg}; color:${l.fg}; border-color:${l.fg};" onclick="go('link-${l.id}');return false;">${l.name}</a>`;
+}
+function linksHtml() {
+  let h = '<div class="ptitle">☆ りんく ☆</div>';
+  h += '<div class="small-note">相互リンクしてくれてるお友達のサイトです♪</div>';
+  LINKS.filter(l => l.id !== 'sozai').forEach(l => { h += `<div class="link-row">${bannerHtml(l)}<div class="link-note">${l.note}</div></div>`; });
+  h += '<div class="ptitle" style="margin-top:18px;">☆ 素材 ☆</div>';
+  h += `<div class="link-row">${bannerHtml(LINKS.find(l => l.id === 'sozai'))}<div class="link-note">素材をお借りしてます</div></div>`;
+  h += `<div class="ptitle" style="margin-top:18px;">☆ うちのバナー ☆</div>
+    <div class="link-row"><span class="banner own">ひみつのおへや</span></div>
+    <div class="small-note">リンクフリーです☆ バナーはお持ち帰りしてね。<br><b>直リンは禁止です！！</b><br>相互リンク希望の方はBBSで言ってね♪</div>`;
+  return h;
+}
+// リンク先はリンク切れ。ただし☆みかん箱☆だけ、第三段階からいつの間にか開ける
+function linkTargetHtml(id) {
+  if (id === 'mikan' && state.step >= STAGE_SELF) {
+    return `<div class="closed">
+      <div class="ptitle">☆みかん箱☆</div>
+      <p>☆みかん箱☆は閉鎖しました。</p>
+      <p>いままで遊びに来てくれたみんな、ほんとにありがとう！</p>
+      <p style="margin-top:14px; font-size:11px; color:var(--sub);">2003.08.18</p>
+    </div>`;
+  }
+  return `
+    <div class="ie-error">
+      <div class="ie-error-title">ページを表示できません</div>
+      <div>検索中のページは現在、利用できません。Web サイトに技術的な問題が発生しているか、ブラウザの設定を調整する必要があります。</div>
+      <hr>
+      <div>HTTP 404 - ファイル未検出<br>Internet Explorer</div>
+    </div>`;
+}
+
+// ===== 更新履歴（トップ）：日記が増えるたびに一行増え、最新にNEW! =====
+function updatesHtml() {
+  let h = '<div class="updates"><div class="menu-title">☆ 更新履歴 ☆</div>';
+  for (let s = state.step; s >= Math.max(0, state.step - 4); s--) {
+    const d = latestDate(s).slice(5);
+    let text;
+    if (s === 0) text = 'HPオープンしました☆';
+    else {
+      const ids = STEPS[s];
+      const newest = state.posts.find(p => p.id === ids[ids.length - 1]);
+      text = `にっき更新「${newest.title}」`;
+      if (PHOTOS.some(p => p.step === s)) text += '・しゃしん追加';
+    }
+    h += `<div class="upd"><span class="upd-date">${d}</span> ${text}${s === state.step ? ' <span class="new-badge blink">NEW!</span>' : ''}</div>`;
+  }
+  return h + '</div>';
+}
+
+function toEnding() { state.currentPage = 'ending'; state.ended = true; render(); }
+function kiriOk() {
+  state.currentPage = 'kiribbs';
+  render();
+  setTimeout(() => { if (state.currentPage === 'kiribbs') toEnding(); }, 7000);
+}
+
+function pad(n) { return String(n).padStart(8, '0'); }
+function counterHtml(n) { return pad(n).split('').map(d => `<span class="digit">${d}</span>`).join(''); }
+
+// 段 s までに公開された日記の最新日付（'2003.MM.DD' は文字列比較でOK）
+function latestDate(s) {
+  if (s < 0) return '';
+  let max = '';
+  state.posts.forEach(p => { if (revealAt[p.id] <= s && p.date > max) max = p.date; });
+  return max;
+}
+
+function currentCounter() {
+  const base = counterAt(state.step);
+  if (state.step < DEATH_STEP) return base;
+  // 死後は、ページを動くたび・トップで待つたびにさらに削れる。ただし次の段の値は越えない
+  const next = state.step < LAST_STEP ? counterAt(state.step + 1) : 1000;
+  const room = Math.max(0, base - next - 1);
+  return base - Math.min(state.drift, room);
+}
+
+// ===== 侵食：死後、画面が少しずつ赤黒くなる =====
+function mix(a, b, k) {
+  const pa = a.match(/\w\w/g).map(h => parseInt(h, 16));
+  const pb = b.match(/\w\w/g).map(h => parseInt(h, 16));
+  return '#' + pa.map((v, i) => Math.round(v + (pb[i] - v) * k).toString(16).padStart(2, '0')).join('');
+}
+function applyDecay() {
+  // 死後、ページの色がほんの少しずつ褪せていく。エンディングでは元の色に戻る
+  const k = state.currentPage === 'ending' ? 0 : Math.max(0, Math.min(1, (state.step - DEATH_STEP + 1) / (LAST_STEP - DEATH_STEP + 1)));
+  document.getElementById('content').style.filter = k ? `saturate(${1 - 0.55 * k})` : '';
+  document.getElementById('title').textContent =
+    'Internet Explorer - MI⭐︎KUの部屋';
+}
+
+// ===== MIDI：トップで鳴るオルゴール。死後は崩れていく =====
+let actx = null, musicToken = 0, musicMode = '', muted = false;
+const MELODY_TOP = [[523,1],[659,1],[784,1],[659,1],[698,1],[880,1],[784,2],
+                    [659,1],[784,1],[1047,1],[784,1],[880,1],[784,1],[659,2],
+                    [587,1],[698,1],[880,1],[698,1],[784,1],[659,1],[523,2],
+                    [587,1],[659,1],[698,1],[587,1],[523,3]];
+const MELODY_END = [[392,.75],[392,.25],[440,1],[392,1],[523,1],[494,2],
+                [392,.75],[392,.25],[440,1],[392,1],[587,1],[523,2],
+                [392,.75],[392,.25],[784,1],[659,1],[523,1],[494,1],[440,2],
+                [698,.75],[698,.25],[659,1],[523,1],[587,1],[523,2]];
+function ensureAudio() {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
+  if (actx.state === 'suspended') actx.resume();
+}
+function playNote(f, dur, type, vol) {
+  const t = actx.currentTime;
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.95);
+  o.connect(g).connect(actx.destination);
+  o.start(t); o.stop(t + dur);
+}
+function startMusic(mode) {
+  const my = ++musicToken;
+  musicMode = mode;
+  if (!actx || muted) return;
+  const decay = Math.max(0, Math.round((state.step - DEATH_STEP + 1) * 6 / (LAST_STEP - DEATH_STEP + 1)));  // 0〜6
+  const ending = mode === 'ending';
+  const beat = ending ? 0.85 : 0.3 * (1 + decay * 0.2);
+  let i = 0;
+  const tick = () => {
+    if (my !== musicToken) return;
+    const MELODY = ending ? MELODY_END : MELODY_TOP;
+    if (i >= MELODY.length) {
+      if (ending) return;                                             // エンディングは一度きり
+      i = 0; setTimeout(tick, beat * 2000); return;
+    }
+    const [f, d] = MELODY[i++];
+    const detune = decay ? Math.pow(2, ((Math.random() * 2 - 1) * decay * 14) / 1200) : 1;
+    const skip = decay && Math.random() < decay * 0.06;
+    if (!skip) playNote(f * detune * (ending ? 0.5 : 1), beat * d,
+                        ending || decay > 2 ? 'triangle' : 'square', ending ? 0.09 : 0.04);
+    setTimeout(tick, beat * d * 1000);
+  };
+  tick();
+}
+function updateMusic() {
+  if (musicMode === 'mail' || state.wiped) return;
+  const want = state.currentPage === 'top' ? 'top' : state.currentPage === 'ending' ? 'ending' : '';
+  if (want === musicMode) return;
+  if (want) startMusic(want); else { musicToken++; musicMode = ''; }
+}
+let justUnlocked = false;
+function toggleMute() {
+  if (justUnlocked) { justUnlocked = false; } else { muted = !muted; }
+  musicMode = ''; musicToken++;
+  updateMusic();
+}
+// ブラウザの自動再生制限のため、最初のタップで音を有効化する
+document.addEventListener('click', (e) => {
+  const first = !actx;
+  ensureAudio();
+  if (!first) return;
+  if (e.target.closest && e.target.closest('.midi-player')) { justUnlocked = true; return; }
+  musicMode = ''; updateMusic();
+}, true);
+
+// 死後、トップを開いている間カウンターが勝手に減っていく
+let counterTimer = null;
+function updateCounterTimer() {
+  clearInterval(counterTimer);
+  if (state.currentPage !== 'top' || state.step < DEATH_STEP) return;
+  counterTimer = setInterval(() => {
+    state.drift++;
+    state.counter = currentCounter();
+    const el = document.getElementById('counterNum');
+    if (el) el.innerHTML = counterHtml(state.counter);
+  }, 2600);
+}
+
+
+// ===== しゃしん：2003年頃のデジカメ写真をコードで描く =====
+// step = 公開される段 / cap = キャプション（仮文。空なら無言）
+const PHOTOS = [
+  {id:'sakura',  step:revealAt[21],  date:'2003.04.14', stamp:"'03  4 14", cap:'部屋の窓から。桜（＾＾）',     scene:{type:'window', season:'spring', time:'day'}},
+  {id:'cd',      step:revealAt[27],  date:'2003.04.02', stamp:"'03  4  2", cap:'新しいCD☆',                    scene:{type:'cd'}},
+  {id:'sky',     step:revealAt[29],  date:'2003.05.25', stamp:"'03  5 25", cap:'空。',                         scene:{type:'sky'}},
+  {id:'room',    step:revealAt[43],  date:'2003.07.07', stamp:"'03  7  7", cap:'わたしの部屋。散らかってる（汗）', scene:{type:'room'}},
+  {id:'monitor', step:revealAt[53],  date:'2003.08.06', stamp:"'03  8  6", cap:'',                             scene:{type:'monitor'}},
+  {id:'window2', step:revealAt[59], date:'2003.08.24', stamp:"'03  8 24", cap:'窓。',                         scene:{type:'window', season:'summer', time:'day', curtain:0.6}},
+  // ---- 死後 ----
+  {id:'window3', step:revealAt[68], date:'2003.09.25', stamp:"'03  9 25", cap:'窓。',                         scene:{type:'window', season:'autumn', time:'dusk', curtain:0.4}},
+  {id:'window4', step:revealAt[72], date:'2003.10.10', stamp:"'03 10 10", cap:'窓。',                         scene:{type:'window', season:'autumn', time:'night', curtain:0.75}},
+  {id:'outside', step:revealAt[74], date:'2003.10.18', stamp:"'-- -- --",  cap:'',                             scene:{type:'outside'}}
+];
+const photoCache = {};
+
+function rnd(seed) { let x = seed; return () => (x = (x * 1103515245 + 12345) % 2147483648) / 2147483648; }
+
+function drawScene(g, W, H, sc, r) {
+  const rect = (c, x, y, w, h) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+  const blob = (c, x, y, rx, ry) => { g.fillStyle = c; g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); g.fill(); };
+
+  if (sc.type === 'window') {
+    const sky = {day:['#8fc4ee','#d9ecf7'], dusk:['#5a3a5e','#d08a5a'], night:['#05060c','#1a1020']}[sc.time];
+    const wall = {day:'#d8ccb4', dusk:'#8a6a58', night:'#1c1412'}[sc.time];
+    rect(wall, 0, 0, W, H);
+    const wx = 34, wy = 14, ww = 92, wh = 78;
+    const gr = g.createLinearGradient(0, wy, 0, wy + wh); gr.addColorStop(0, sky[0]); gr.addColorStop(1, sky[1]);
+    rect(gr, wx, wy, ww, wh);
+    if (sc.season === 'spring') for (let i = 0; i < 26; i++) blob(['#f2b8c8','#f7d0dc','#e89ab0'][i % 3], wx + 10 + r() * 70, wy + 30 + r() * 45, 6 + r() * 8, 5 + r() * 6);
+    if (sc.season === 'summer') for (let i = 0; i < 18; i++) blob(['#4f8a3c','#6aa14a'][i % 2], wx + 8 + r() * 76, wy + 40 + r() * 36, 7 + r() * 7, 6 + r() * 5);
+    if (sc.season === 'autumn') for (let i = 0; i < 14; i++) blob(sc.time === 'night' ? '#120a0a' : ['#7a3a22','#5e2c1c'][i % 2], wx + 8 + r() * 76, wy + 46 + r() * 30, 7 + r() * 6, 5 + r() * 5);
+    if (sc.time === 'night') rect('#e8d8a0', wx + 70, wy + 12, 2, 2);
+    const fr = {day:'#f2efe8', dusk:'#a08878', night:'#2a2220'}[sc.time];
+    rect(fr, wx - 4, wy - 4, ww + 8, 5); rect(fr, wx - 4, wy + wh, ww + 8, 6);
+    rect(fr, wx - 4, wy - 4, 5, wh + 8); rect(fr, wx + ww - 1, wy - 4, 5, wh + 8); rect(fr, wx + ww / 2 - 2, wy, 4, wh);
+    const cw = (sc.curtain || 0.25) * ww * 0.55;
+    const cc = {day:'#c9a6c2', dusk:'#6e4658', night:'#24141a'}[sc.time];
+    rect(cc, wx - 10, wy - 8, cw + 10, wh + 18); rect(cc, wx + ww - cw, wy - 8, cw + 10, wh + 18);
+    rect({day:'#b9a88c', dusk:'#5a4234', night:'#100a08'}[sc.time], 0, 100, W, 20);
+  } else if (sc.type === 'cd') {
+    rect('#8a5a34', 0, 0, W, H);
+    for (let y = 0; y < H; y += 3) rect('rgba(60,30,10,0.18)', 0, y + (r() * 2 | 0), W, 1);
+    g.save(); g.translate(80, 62); g.rotate(-0.12);
+    rect('rgba(0,0,0,0.3)', -44, -36, 92, 82);
+    rect('#e8eef2', -46, -40, 92, 80); rect('#c8d2d8', -40, -34, 80, 68);
+    const cdg = g.createRadialGradient(-6, -6, 2, 0, 0, 30);
+    cdg.addColorStop(0, '#f4f4f8'); cdg.addColorStop(0.5, '#b8c8e0'); cdg.addColorStop(0.7, '#e0c8e8'); cdg.addColorStop(1, '#9aa8b8');
+    g.fillStyle = cdg; g.beginPath(); g.arc(0, 0, 30, 0, Math.PI * 2); g.fill();
+    blob('#c8d2d8', 0, 0, 5, 5);
+    g.restore();
+  } else if (sc.type === 'sky') {
+    const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#5f9ede'); gr.addColorStop(1, '#bcdaf2');
+    rect(gr, 0, 0, W, H);
+    for (let i = 0; i < 7; i++) blob('rgba(255,255,255,0.85)', 30 + r() * 100, 30 + r() * 30, 14 + r() * 16, 6 + r() * 6);
+    rect('#2a2a2a', 142, 0, 6, H);
+    g.strokeStyle = '#222'; g.lineWidth = 1;
+    for (let k = 0; k < 3; k++) { g.beginPath(); g.moveTo(0, 70 + k * 9); g.quadraticCurveTo(70, 88 + k * 9, 145, 20 + k * 6); g.stroke(); }
+  } else if (sc.type === 'room') {
+    rect('#d4c6a8', 0, 0, W, H); rect('#a88c66', 0, 92, W, 28);
+    rect('#9fc0dc', 104, 14, 40, 34); rect('#c9a6c2', 98, 10, 10, 44); rect('#c9a6c2', 140, 10, 10, 44);
+    rect('#f0ece4', 8, 66, 80, 34); rect('#e8a8b8', 8, 72, 80, 28);
+    blob('#fafafa', 24, 68, 14, 6);
+    rect('#4a4a58', 96, 96, 18, 12); rect('#e8e0c0', 120, 100, 14, 9); rect('#c04848', 60, 104, 10, 6); rect('#f8f8f8', 36, 104, 16, 3);
+    rect('#3a3a3a', 112, 62, 30, 26); rect('#1a2a1a', 116, 66, 22, 16);
+  } else if (sc.type === 'monitor') {
+    rect('#1a1612', 0, 0, W, H); rect('#3a2c20', 0, 96, W, 24);
+    rect('#cfc6b0', 24, 8, 112, 90); rect('#bfb6a0', 30, 90, 100, 8);
+    rect('#050505', 32, 14, 96, 70);
+    g.font = 'bold 7px monospace'; g.fillStyle = '#d040d0'; g.textAlign = 'center';
+    g.fillText('ひみつのおへや', 80, 32);
+    g.font = 'bold 13px monospace'; g.fillStyle = '#30ff30';
+    g.fillText('00001000', 80, 56);
+    g.font = '6px monospace'; g.fillStyle = '#e0e040'; g.fillText('キリ番を踏んだ方は', 80, 72);
+    const gl = g.createRadialGradient(56, 30, 1, 56, 30, 40); gl.addColorStop(0, 'rgba(255,255,255,0.18)'); gl.addColorStop(1, 'rgba(255,255,255,0)');
+    rect(gl, 32, 14, 96, 70);
+  } else if (sc.type === 'outside') {
+    rect('#04050a', 0, 0, W, H); rect('#121014', 10, 20, 140, 100);
+    rect('#0a080a', 0, 104, W, 16);
+    const lit = g.createLinearGradient(0, 40, 0, 84); lit.addColorStop(0, '#d89060'); lit.addColorStop(1, '#8a3424');
+    rect(lit, 58, 40, 44, 44);
+    rect('#3a1a14', 58, 40, 12, 44); rect('#3a1a14', 90, 40, 12, 44); rect('#2a1612', 78, 40, 4, 44);
+    rect('#1a1214', 54, 36, 52, 4); rect('#1a1214', 54, 84, 52, 4);
+    rect('#2a2a30', 132, 0, 5, 120);
+  }
+
+  // 粒子ノイズと周辺減光
+  const img = g.getImageData(0, 0, W, H), d = img.data, amt = sc.time === 'night' || sc.type === 'outside' ? 26 : 12;
+  for (let i = 0; i < d.length; i += 4) { const n = (r() - 0.5) * amt; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  g.putImageData(img, 0, 0);
+  const vg = g.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.75);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.45)');
+  rect(vg, 0, 0, W, H);
+}
+
+function photoURL(p) {
+  if (photoCache[p.id]) return photoCache[p.id];
+  const W = 160, H = 120;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  let seed = 0; for (const ch of p.id) seed = (seed * 31 + ch.charCodeAt(0)) % 100000;
+  drawScene(g, W, H, p.scene, rnd(seed + 7));
+  // 日付スタンプ（オレンジの7セグ風）
+  g.font = 'bold 9px monospace'; g.textAlign = 'right';
+  g.fillStyle = 'rgba(0,0,0,0.5)'; g.fillText(p.stamp, W - 5, H - 5);
+  g.fillStyle = '#ff9a28'; g.fillText(p.stamp, W - 6, H - 6);
+  // 低画質JPEGに一度落として、ブロックノイズを乗せる
+  let url;
+  try {
+    url = cv.toDataURL('image/jpeg', 0.22);
+  } catch (e) { url = cv.toDataURL(); }
+  photoCache[p.id] = url;
+  return url;
+}
+
+function photoPageHtml() {
+  const shown = PHOTOS.filter(p => p.step <= state.step);
+  let html = '<div class="ptitle">☆ しゃしん ☆</div>';
+  if (!shown.length) {
+    return html + `
+      <div class="under-construction">
+        <div class="uc-text">工事中</div>
+        <div class="uc-barrier">🚧🚧🚧🚧🚧</div>
+        <div class="uc-sub">ただいま準備中です</div>
+        <div class="uc-sub" style="font-size:12px; margin-top:6px;">もうしばらくお待ちください</div>
+      </div>`;
+  }
+  html += '<div class="photo-grid">';
+  shown.slice().reverse().forEach(p => {
+    const isNew = p.step === state.step;
+    html += `
+      <div class="photo">
+        <img src="${photoURL(p)}" alt="" width="160" height="120">
+        <div class="photo-date">${p.date}${isNew ? ' <span class="new-badge blink">NEW!</span>' : ''}</div>
+        ${p.cap ? `<div class="photo-cap">${p.cap}</div>` : ''}
+      </div>`;
+  });
+  html += '</div>';
+  if (state.step < DEATH_STEP) html += '<div class="uc-sub" style="text-align:center; margin-top:14px; font-size:12px;">🚧 まだまだ追加予定！ 🚧</div>';
+  return html;
+}
+
+function render() {
+  const c = document.getElementById('content');
+  const url = document.getElementById('url');
+  let html = '';
+
+  // 最後の日記を読んだあと、トップに戻ったらキリ番
+  if (state.sawLast && state.currentPage === 'top') state.currentPage = 'kiriban';
+  const finale = ['kiriban', 'kiribbs', 'ending'].includes(state.currentPage);
+  state.counter = finale ? 1000 : currentCounter();
+
+  if (state.currentPage === 'ending') {
+    html = `
+      <div class="ending">
+        <div class="blink" style="color:var(--accent); margin-bottom:16px;">★☆★ キリ番を踏んだらBBSにカキコしてね ★☆★</div>
+        <div>あなたは</div>
+        <div class="big-counter counter-img">${counterHtml(state.counter)}</div>
+        <div>人目のお客様です</div>
+        <div class="deco" style="margin:24px 0;">･*:.｡. .｡.:*･゜ﾟ･*☆*･ﾟ゜･*:.｡. .｡.:*･</div>
+        <div class="birthday blink">お誕生おめでとう</div>
+        <div class="lastupdate" style="margin-top:50px;">Last Update : ––.–.–</div>
+      </div>`;
+    url.textContent = 'http://www.???.ne.jp/~room/';
+    c.innerHTML = html;
+    afterRender();
+    return;
+  }
+
+  if (state.currentPage === 'top' || state.currentPage === 'kiriban') {
+    url.textContent = 'http://www.???.ne.jp/~room/';
+    html = `
+      <div class="marquee"><span>･ﾟ★,｡･:*:･ﾟ☆ ようこそ ひみつのおへやへ ☆ﾟ･:*:･｡,★ﾟ･　キリ番踏んだ人はBBSにカキコしてね♪　踏み逃げ禁止！！</span></div>
+      <div class="welcome">
+        <div class="deco">･*:.｡. .｡.:*･゜ﾟ･*☆*･ﾟ゜･*:.｡. .｡.:*･</div>
+        <h1>ひみつのおへや</h1>
+        <div class="since">Since 2003.03.03</div>
+      </div>
+      <div class="midi-player" onclick="toggleMute()">♪ MIDI Playing... (auto) ♪</div>
+      <div class="counter">あなたは <span class="counter-img" id="counterNum">${counterHtml(state.counter)}</span> 人目のお客様です</div>
+      <div class="kiriban">キリ番を踏んだ方はBBSにカキコしてね♪<br><span class="blink">踏み逃げ禁止！！</span></div>
+      ${updatesHtml()}
+      <div class="menu">
+        <div class="menu-title">☆ MENU ☆</div>
+        <a href="#" onclick="go('profile');return false;">ぷろふぃーる</a>
+        <a href="#" onclick="go('diary');return false;">にっき</a> <span class="new-badge blink">NEW!</span>
+        <a href="#" onclick="go('photo');return false;">しゃしん</a>
+        <a href="#" onclick="go('bbs');return false;">BBS</a>
+        <a href="#" onclick="go('links');return false;">りんく</a>
+        <a href="#" onclick="go('about');return false;">このサイトについて</a>
+      </div>
+      <div class="deco">･*:.｡. .｡.:*･゜ﾟ･*☆*･ﾟ゜･*:.｡. .｡.:*･</div>
+      <div class="small-note">800×600推奨／IE5.5以上推奨<br>文字サイズ「中」で見てね♪</div>
+      <div class="footer-note">※ 無断転載・直リン禁止 ※</div>
+      <div class="lastupdate">Last Update : 2003.08.17</div>
+      <div class="credit">壁紙・アイコン：<a href="#" onclick="go('link-sozai');return false;">ほしくず素材堂</a> 様</div>
+    `;
+    if (state.currentPage === 'kiriban') {
+      html += `
+      <div class="dlg-back"><div class="dlg">
+        <div class="dlg-title">Microsoft Internet Explorer</div>
+        <div class="dlg-body"><span class="dlg-icon">!</span>キリ番おめでとうございます！</div>
+        <div class="dlg-btns"><button onclick="kiriOk()">OK</button></div>
+      </div></div>`;
+    }
+  } else if (state.currentPage === 'diary') {
+    url.textContent = 'http://www.???.ne.jp/~room/diary.html';
+    if (state.step === LAST_STEP) state.sawLast = true;
+    const visiblePosts = state.posts.filter(p => revealAt[p.id] <= state.step).reverse();
+    html = '<div class="ptitle">☆ にっき ☆</div>';
+    visiblePosts.forEach(p => {
+      const isNew = revealAt[p.id] === state.step;
+      html += `
+        <div class="diary-item" id="post-${p.id}">
+          <div class="date">${p.date}${isNew ? ' <span class="new-badge blink">NEW!</span>' : ''}</div>
+          <div class="title">${p.title}</div>
+          <div>${bodyOf(p).replace(/\n/g, '<br>')}</div>
+          ${(AUTO_LINKS[p.id] || []).map(t => { const q = state.posts.find(x => x.id === t); return `<div class="autolink"><a href="#" onclick="jumpTo(${t});return false;">→ ${q.date} ${q.title}</a></div>`; }).join('')}
+          <div class="cat">カテゴリ：${categoryOf(p)}</div>
+        </div>`;
+    });
+    visiblePosts.forEach(p => { if (state.readIds[p.id] === undefined) state.readIds[p.id] = state.step; });
+  } else if (state.currentPage === 'bbs' || state.currentPage === 'kiribbs') {
+    url.textContent = 'http://www.???.ne.jp/~room/bbs.html';
+    const kiri = state.currentPage === 'kiribbs';
+    const until = latestDate(state.step);
+    const prev = latestDate(state.step - 1);
+    const replyItems = [];
+    state.playerPosts.forEach(pp => {
+      if (!(pp.replies || []).length || (state.navCount || 0) < pp.due) return;
+      pp.replies.forEach((r, k) => replyItems.push({...r, date: pp.date, seq: pp.seq + (k + 1) / 10, reply: true, ref: r}));
+    });
+    const shown = BBS.filter(p => p.date <= until && (p.appear || 0) <= state.step).concat(state.playerPosts, replyItems)
+      .sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.seq - b.seq);
+    if (kiri) shown.push({...KIRI_POST, date: until, kiri: true});
+    setTimeout(() => { replyItems.forEach(x => { x.ref.seen = true; }); saveGame(); }, 0);
+    shown.forEach((p, i) => { p.no = String(i + 1).padStart(4, '0'); });
+    html = `<div class="ptitle">☆ おしゃべりBBS ☆</div><div class="small-note" style="margin-bottom:8px;">荒らし・宣伝はやめてね。キリ番報告大歓迎♪</div>`;
+    if (!kiri) html += `
+      <div class="bbs-form">
+        <div>おなまえ <input id="bbsHn" maxlength="16" value="${esc(state.lastHn)}"></div>
+        <textarea id="bbsText" rows="3" maxlength="200"></textarea>
+        <div style="text-align:right;"><button onclick="postBbs()">書き込む</button></div>
+      </div>`;
+    html += `<div style="text-align:right; font-size:11px; color:var(--sub); margin-bottom:8px;">記事 ${shown.length ? shown[0].no.slice(1) : '000'}〜${shown.length ? shown[shown.length - 1].no.slice(1) : '000'}</div>`;
+    shown.slice().reverse().forEach(p => {
+      const isNew = p.kiri || (p.reply ? !p.ref.seen : (!p.player && !p.appear && state.step > 0 && p.date > prev));
+      const adminClass = p.admin ? ' admin-post' : '';
+      const onclick = p.admin ? ' onclick="shiftPost(this)"' : '';
+      const hnStyle = p.admin ? ' style="color:var(--accent);"' : '';
+      html += `<div class="bbs-post${adminClass}"${onclick}><div class="hn"${hnStyle}>${p.player ? esc(p.hn) : p.hn}</div><div class="no">No.${p.no}　${p.date}${isNew ? ' <span class="new-badge blink">NEW!</span>' : ''}</div>${p.player ? esc(p.text).replace(/\n/g, '<br>') : p.text}</div>`;
+    });
+  } else if (state.currentPage === 'profile') {
+    url.textContent = 'http://www.???.ne.jp/~room/profile.html';
+    html = `<div class="ptitle">☆ ぷろふぃーる ☆</div>
+      <table class="prof">
+        <tr><th>HN</th><td>みく</td></tr>
+        <tr><th>せいべつ</th><td>おんなのこ</td></tr>
+        <tr><th>がくねん</th><td>高校生（ひみつ☆）</td></tr>
+        <tr><th>すんでるとこ</th><td>ひみつ</td></tr>
+        <tr><th>すきなもの</th><td>音楽／ネット／プリクラ／雨の日</td></tr>
+        <tr><th>きらいなもの</th><td>数学（＞＿＜）</td></tr>
+        <tr><th>ひとこと</th><td>ふつうの女子高生です。日記書いてます。仲良くしてね♪</td></tr>
+      </table>`;
+  } else if (state.currentPage === 'links') {
+    url.textContent = 'http://www.???.ne.jp/~room/link.html';
+    html = linksHtml();
+  } else if (state.currentPage.startsWith('link-')) {
+    html = linkTargetHtml(state.currentPage.slice(5));
+    url.textContent = (LINKS.find(x => x.id === state.currentPage.slice(5)) || {url: ''}).url;
+  } else if (state.currentPage === 'about') {
+    url.textContent = 'http://www.???.ne.jp/~room/about.html';
+    if (state.step < LAST_STEP) {
+      html = `
+        <div class="ie-error">
+          <div class="ie-error-title">ページを表示できません</div>
+          <div>検索中のページは現在、利用できません。Web サイトに技術的な問題が発生しているか、ブラウザの設定を調整する必要があります。</div>
+          <hr>
+          <div>HTTP 404 - ファイル未検出<br>Internet Explorer</div>
+        </div>`;
+    } else {
+      const now = new Date();
+      html = `
+        <div class="ptitle">☆ このサイトについて ☆</div>
+        <p>管理人：みく</p>
+        <p>誕生日：${now.getMonth() + 1}月${now.getDate()}日</p>
+        <p>開設：2003.03.03</p>
+        <p style="margin-top:12px;">リンクフリーです☆</p>
+        <p>キリ番を踏んだ方はBBSにカキコしてね♪</p>
+        <p>踏み逃げ禁止！！</p>`;
+    }
+  } else if (state.currentPage === 'photo') {
+    url.textContent = 'http://www.???.ne.jp/~room/photo.html';
+    html = photoPageHtml();
+  }
+
+  c.innerHTML = html;
+  c.scrollTop = 0;
+  afterRender();
+}
+
+function afterRender() {
+  saveGame();
+  if (state.currentPage === 'ending' && !state.wiped) scheduleMailer();
+  applyDecay();
+  updateMusic();
+  updateCounterTimer();
+  maybeFlicker();
+}
+
+// ===== 1000の瞬き：キリ番は対象者の画面にしか出ない =====
+// トップを開いた瞬間だけ、カウンターが一瞬 00001000 に見える。
+// 生前は「誕生日じゃないのに」と「病気だとわかった」の段で一度ずつ。死後は毎回。
+const FLICKER_STEPS = [revealAt[56], revealAt[61]];
+const flickered = {};
+function maybeFlicker() {
+  if (state.currentPage !== 'top') return;
+  const s = state.step;
+  const before = FLICKER_STEPS.includes(s) && !flickered[s];
+  const after = s > DEATH_STEP;
+  if (!before && !after) return;
+  flickered[s] = true;
+  const el = document.getElementById('counterNum');
+  if (!el) return;
+  el.innerHTML = counterHtml(1000);
+  setTimeout(() => { el.innerHTML = counterHtml(state.counter); }, before ? 140 : 90);
+}
+
+function go(page) {
+  if (state.currentPage === 'ending' || state.currentPage === 'kiriban') return;
+  if (state.currentPage === 'kiribbs') { toEnding(); return; }
+  state.history = state.history.slice(0, state.historyIndex + 1);
+  state.history.push(page);
+  state.navCount = (state.navCount || 0) + 1;
+  state.historyIndex++;
+  state.currentPage = page;
+
+  // 日記を開くたびに1段進む（初回は最初の3記事のまま）
+  if (page === 'diary') {
+    if (state.diaryOpens > 0 && state.step < LAST_STEP) {
+      state.step++;
+      state.drift = 0;
+    }
+    state.diaryOpens++;
+  }
+  // 死後はページを移動するたびにカウンターが少しずつ削れる
+  if (state.step >= DEATH_STEP) state.drift++;
+
+  render();
+}
+
+function goHome() { go('top'); }
+function goBack() {
+  if (['ending', 'kiriban'].includes(state.currentPage)) return;
+  if (state.currentPage === 'kiribbs') { toEnding(); return; }
+  if (state.historyIndex > 0) {
+    state.historyIndex--;
+    state.currentPage = state.history[state.historyIndex];
+    render();
+  }
+}
+function goForward() {
+  if (['ending', 'kiriban'].includes(state.currentPage)) return;
+  if (state.currentPage === 'kiribbs') { toEnding(); return; }
+  if (state.historyIndex < state.history.length - 1) {
+    state.historyIndex++;
+    state.currentPage = state.history[state.historyIndex];
+    render();
+  }
+}
+function refresh() { state.navCount = (state.navCount || 0) + 1; render(); }
+
+function shiftPost(el) {
+  if (state.step < DEATH_STEP) return; // 死亡前はズレない
+  el.classList.add('shift');
+  setTimeout(() => el.classList.remove('shift'), 300);
+}
+
+
+// ===== エンディング後：メーラーが勝手に開く → 2通目でHDDが消されていく（すべて画面上の演出） =====
+const MAIL_DELAY = 9000;   // 最後の画面からメーラーが開くまで（ミリ秒）
+let mailTimer = null;
+
+function fakeNow() {
+  const n = new Date();
+  const p2 = v => String(v).padStart(2, '0');
+  return `2003/${p2(n.getMonth() + 1)}/${p2(n.getDate())} ${p2(n.getHours())}:${p2(n.getMinutes())}`;
+}
+
+// 本文は仮文（差し替え前提）
+const MAILS = [
+  {
+    from: '中谷美久', addr: 'miku@???.ne.jp', subject: 'お誕生おめでとう☆', attach: '',
+    body: `お誕生おめでとう（＾＾）
+
+キリ番、踏んでくれたんだね。
+ちゃんと見てたよ。
+すっごくうれしい！
+
+みんなも待ってるよ。
+☆みかん☆も、ぽん太も、さっちんも、
+みーんな待ってる。
+
+はやくおいでね。
+また明日ね☆
+
+――――――――――――
+中谷 美久
+http://www.???.ne.jp/~room/
+――――――――――――`
+  },
+  {
+    from: '中谷美久', addr: 'miku@???.ne.jp', subject: 'プレゼント', attach: 'birthday.scr (12 KB)',
+    body: `プレゼントだよ（＾＾）`
+  }
+];
+
+function scheduleMailer() {
+  if (mailTimer || state.wiped || document.getElementById('mailer')) return;
+  mailTimer = setTimeout(openMailer, MAIL_DELAY);
+}
+
+function openMailer() {
+  musicToken++; musicMode = 'mail';             // 音楽を止める
+  if (actx) { playNote(1318, 0.12, 'sine', 0.08); setTimeout(() => playNote(988, 0.2, 'sine', 0.08), 130); }
+  const box = document.createElement('div');
+  box.id = 'mailer';
+  box.innerHTML = `
+    <div class="titlebar"><span>受信トレイ - Outlook Express</span><div class="buttons"><div class="btn">_</div><div class="btn">□</div><div class="btn">×</div></div></div>
+    <div class="ml-menu">ファイル(F)　編集(E)　表示(V)　ツール(T)　メッセージ(M)　ヘルプ(H)</div>
+    <div class="ml-tools"><span>新規作成</span><span>返信</span><span>全員に返信</span><span>転送</span><span>送受信</span></div>
+    <div class="ml-folder">📥 受信トレイ (<span id="mlUnread">2</span>)</div>
+    <div class="ml-list">
+      <div class="ml-head"><span>!</span><span>差出人</span><span>件名</span><span>受信日時</span></div>
+      ${MAILS.map((m, i) => `<div class="ml-row unread" id="mlRow${i}" onclick="openMail(${i})"><span>✉</span><span>${m.from}</span><span>${m.subject}${m.attach ? ' 📎' : ''}</span><span>${fakeNow()}</span></div>`).join('')}
+    </div>
+    <div class="ml-preview" id="mlPreview"><div class="ml-empty">メッセージが選択されていません。</div></div>
+    <div class="ml-status">メッセージ: 2 件、未開封: <span id="mlUnread2">2</span> 件</div>`;
+  document.querySelector('.browser').appendChild(box);
+  state.mailOpen = true; saveGame();
+}
+
+function openMail(i) {
+  const m = MAILS[i];
+  const row = document.getElementById('mlRow' + i);
+  if (row.classList.contains('unread')) {
+    row.classList.remove('unread'); row.firstElementChild.textContent = '📧';
+    const left = document.querySelectorAll('.ml-row.unread').length;
+    document.getElementById('mlUnread').textContent = left;
+    document.getElementById('mlUnread2').textContent = left;
+  }
+  document.querySelectorAll('.ml-row').forEach(r => r.classList.remove('sel'));
+  row.classList.add('sel');
+  document.getElementById('mlPreview').innerHTML = `
+    <div class="ml-hdr">
+      <div><b>差出人:</b> ${m.from} &lt;${m.addr}&gt;</div>
+      <div><b>日時:</b> ${fakeNow()}</div>
+      <div><b>宛先:</b> あなた</div>
+      <div><b>件名:</b> ${m.subject}</div>
+      ${m.attach ? `<div><b>添付:</b> <span class="ml-attach" onclick="runVirus()">📎 ${m.attach}</span></div>` : ''}
+    </div>
+    <div class="ml-body">${esc(m.body).replace(/\n/g, '<br>')}</div>`;
+  // 昔のプレビューの穴：開いただけで添付が動く
+  if (i === 1) setTimeout(runVirus, 2600);
+}
+
+// ----- ウイルス -----
+let virusRunning = false;
+function beep(f, d, type = 'square', v = 0.05) { if (actx) playNote(f, d, type, v); }
+function hddNoise() {
+  if (!actx) return;
+  const len = 0.03, buf = actx.createBuffer(1, actx.sampleRate * len, actx.sampleRate), ch = buf.getChannelData(0);
+  for (let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / ch.length);
+  const src = actx.createBufferSource(), g = actx.createGain();
+  g.gain.value = 0.06; src.buffer = buf; src.connect(g).connect(actx.destination); src.start();
+}
+
+function runVirus() {
+  if (virusRunning) return;
+  virusRunning = true;
+  const layer = document.createElement('div');
+  layer.id = 'virus';
+  document.body.appendChild(layer);
+
+  // 1. 強制終了のダイアログ
+  beep(440, 0.25, 'triangle', 0.08);
+  layer.innerHTML = `<div class="dlg vdlg" style="left:50%; top:40%; transform:translate(-50%,-50%);">
+    <div class="dlg-title">birthday.scr</div>
+    <div class="dlg-body"><span class="dlg-icon" style="background:#e02020;color:#fff;">×</span>このプログラムは不正な処理を行ったので強制終了されます。</div>
+    <div class="dlg-btns"><button>閉じる</button>　<button>詳細 &gt;&gt;</button></div></div>`;
+
+  // 2. 「お誕生おめでとう」のダイアログが増殖する
+  setTimeout(() => {
+    document.querySelector('.browser').classList.add('shake');
+    let n = 0;
+    const spawn = () => {
+      if (n >= 34) { setTimeout(dosWipe, 700); return; }
+      const d = document.createElement('div');
+      d.className = 'dlg vdlg';
+      d.style.left = (Math.random() * 70 + 2) + '%';
+      d.style.top = (Math.random() * 80 + 2) + '%';
+      d.innerHTML = `<div class="dlg-title">Microsoft Internet Explorer</div><div class="dlg-body"><span class="dlg-icon">!</span>お誕生おめでとう</div><div class="dlg-btns"><button>OK</button></div>`;
+      layer.appendChild(d);
+      beep(880 + (n % 5) * 40, 0.05);
+      n++;
+      setTimeout(spawn, Math.max(45, 320 - n * 11));
+    };
+    spawn();
+  }, 2200);
+}
+
+function wipeFiles() {
+  const hn = (state.lastHn || 'user').replace(/[\\/:*?"<>|\s]/g, '');
+  const sys = ['KERNEL32.DLL','USER32.DLL','GDI32.DLL','SHELL32.DLL','COMCTL32.DLL','MSHTML.DLL','WININET.DLL','URLMON.DLL','OLE32.DLL','ADVAPI32.DLL','WSOCK32.DLL','MSVCRT.DLL','RICHED20.DLL','SHDOCVW.DLL','MMSYSTEM.DLL','VMM32.VXD','IOS.VXD','VFAT.VXD'];
+  const L = [];
+  ['C:\\My Documents\\年賀状2003.doc','C:\\My Documents\\写メ\\IMG0001.JPG','C:\\My Documents\\写メ\\IMG0002.JPG','C:\\My Documents\\日記.txt','C:\\My Documents\\My Music\\track01.mid']
+    .forEach(f => L.push(f));
+  ['index.html','diary.html','bbs.html','photo.html','link.html','about.html','counter.cgi','kiriban.gif']
+    .forEach(f => L.push('C:\\WINDOWS\\Temporary Internet Files\\www.???.ne.jp\\~room\\' + f));
+  L.push(`C:\\WINDOWS\\Cookies\\${hn}@www.???.ne.jp[1].txt`);
+  ['MSIMN.EXE','WAB.EXE','INBOX.DBX','SENT ITEMS.DBX'].forEach(f => L.push('C:\\Program Files\\Outlook Express\\' + f));
+  for (let k = 0; k < 3; k++) sys.forEach(f => L.push('C:\\WINDOWS\\SYSTEM\\' + (k ? f.replace('.', k + '.') : f)));
+  ['EXPLORER.EXE','REGEDIT.EXE','SYSTEM.INI','WIN.INI','USER.DAT','SYSTEM.DAT','WIN.COM'].forEach(f => L.push('C:\\WINDOWS\\' + f));
+  ['IO.SYS','MSDOS.SYS','COMMAND.COM'].forEach(f => L.push('C:\\' + f));
+  return L;
+}
+
+function dosWipe() {
+  document.querySelector('.browser').classList.remove('shake');
+  const layer = document.getElementById('virus');
+  layer.innerHTML = '<div class="dos" id="dos"></div>';
+  layer.classList.add('black');
+  const out = document.getElementById('dos');
+  const line = t => { out.textContent += t + '\n'; out.scrollTop = out.scrollHeight; };
+  const files = wipeFiles();
+  line('C:\\WINDOWS>');
+  line('');
+  line('ハードディスクを消去しています...');
+  line('');
+  let i = 0;
+  const step = () => {
+    if (i >= files.length) {
+      line('');
+      line('ハードディスク C: の消去が完了しました。');
+      line('');
+      setTimeout(finalBlack, 2600);
+      return;
+    }
+    const pct = Math.floor((i + 1) / files.length * 100);
+    line(`Deleting ${files[i]} ... OK   [${String(pct).padStart(3, ' ')}%]`);
+    hddNoise();
+    i++;
+    setTimeout(step, i < 14 ? 260 : Math.max(18, 90 - i));
+  };
+  setTimeout(step, 900);
+}
+
+function finalBlack() {
+  state.wiped = true; saveGame();
+  const layer = document.getElementById('virus');
+  layer.innerHTML = '';
+  setTimeout(showDeadScreen, 2200);
+}
+
+// 消えたあと。開き直してもここに来る
+function showDeadScreen() {
+  let layer = document.getElementById('virus');
+  if (!layer) { layer = document.createElement('div'); layer.id = 'virus'; document.body.appendChild(layer); }
+  layer.className = 'black';
+  layer.innerHTML = `<div class="dos dead">Operating System not found<br><span class="cursor">_</span></div>
+    <div class="press" onclick="doReset()">Press any key to restart</div>`;
+  setTimeout(() => { const p = layer.querySelector('.press'); if (p) p.classList.add('show'); }, 6000);
+}
+document.addEventListener('keydown', () => { if (state.wiped && document.querySelector('#virus .press.show')) doReset(); });
+
+// ===== セーブ：進み具合だけブラウザに残す。開き直すと続きから =====
+const SAVE_KEY = 'himitsu_no_oheya_save_v1';
+function saveGame() {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      step: state.step, diaryOpens: state.diaryOpens, drift: state.drift, sawLast: state.sawLast,
+      playerPosts: state.playerPosts, readIds: state.readIds, lastHn: state.lastHn,
+      navCount: state.navCount || 0, greeted: state.greeted || {},
+      ended: !!state.ended, wiped: !!state.wiped, flickered
+    }));
+  } catch (e) { /* 保存できない環境では、その回かぎりで遊べる */ }
+}
+function loadGame() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch (e) { d = null; }
+  if (!d || typeof d.step !== 'number') return;
+  state.step = Math.min(Math.max(0, d.step), LAST_STEP);
+  state.diaryOpens = d.diaryOpens || 0;
+  state.drift = d.drift || 0;
+  state.sawLast = !!d.sawLast;
+  state.playerPosts = Array.isArray(d.playerPosts) ? d.playerPosts : [];
+  state.navCount = d.navCount || 0;
+  state.greeted = d.greeted || {};
+  state.readIds = d.readIds || {};
+  state.lastHn = d.lastHn || '';
+  state.ended = !!d.ended;
+  state.wiped = !!d.wiped;
+  Object.assign(flickered, d.flickered || {});
+  // 終わったあとに開き直すと、最後の画面のまま
+  state.currentPage = state.ended ? 'ending' : 'top';
+  state.history = [state.currentPage];
+  state.historyIndex = 0;
+}
+
+// 最初から読み直す（タイトルバーの×）
+function askReset() {
+  if (document.getElementById('resetDlg')) return;
+  const el = document.createElement('div');
+  el.className = 'dlg-back';
+  el.id = 'resetDlg';
+  el.innerHTML = `<div class="dlg">
+    <div class="dlg-title">Microsoft Internet Explorer</div>
+    <div class="dlg-body"><span class="dlg-icon">?</span>最初から読み直しますか？<br>（これまでの記録は消えます）</div>
+    <div class="dlg-btns"><button onclick="doReset()">はい</button>　<button onclick="document.getElementById('resetDlg').remove()">いいえ</button></div>
+  </div>`;
+  document.body.appendChild(el);
+}
+function doReset() {
+  try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+  location.reload();
+}
+
+loadGame();
+render();
+if (state.wiped) showDeadScreen();
+</script>
+</body>
+</html>
